@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en-US" data-date>
+<head>
+    <link rel="icon" href="Themes/favicon/helmet_favicon.jpg">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Facility Schedule - UWaterloo Athletics Member Portal</title>
+
+    
+    
+        <script nonce="94cdeb7f53b44d4190de54c1f3656352">
+        window.DevExpress = window.DevExpress || {};
+        window.DevExpress.config = {
+            licenseKey: 'ewogICJmb3JtYXQiOiAxLAogICJjdXN0b21lcklkIjogIjFhYTRjMGE2LTI0ZGQtNGYzNS04YWZkLTI2NTA1M2MxZjc4MyIsCiAgIm1heFZlcnNpb25BbGxvd2VkIjogMjQyCn0=.UvXTrzcD+hX391eXIpVHuoc0dOVfuyiP7NpyIOMNR0ECfB17BU20O+Fb39buerr9XlXGh36CGxDlKeRCHP9HW25CmyIMVnI8zAps7QD1TSjTSHFBQUf/DBX5ObHA5xlSnbrUOA=='
+        };
+        </script>
+
+    <script type="text/javascript" src="/bundles/jquery?v=PRKzFb9CosvCBfC4s8J1b61Lsj97nm4lPjMlczW-jXs1" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+
+    <link rel="stylesheet" href="https://cdn3.devexpress.com/jslib/24.2.3/css/dx.light.css" />
+    <script src="https://cdn3.devexpress.com/jslib/24.2.3/js/dx.all.js" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+    
+
+    <script nonce="94cdeb7f53b44d4190de54c1f3656352">
+        DevExpress.localization.locale("en-US");
+    </script>
+
+
+    <link href="/Content/custom/custom.css" rel="stylesheet" type="text/css" />
+    <link href="/bundles/css?v=x28WidBsr5XA4QyEmkZ54mMAb-j9pj_h34oc9C7ZlB41" rel="stylesheet"/>
+
+    
+    <script type="text/javascript" src="/bundles/modernizr?v=inCVuEFe6J4Q07A0AcRsbJic_UE5MwpRMNGcOtk94TE1" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+    <script type="text/javascript" src="/bundles/bootstrap?v=-UU6ZNj8_0E9z7QawhC4UciNIEdjaGSW3CgoG06m_Ss1" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+    <script type="text/javascript" src="/bundles/innosoft?v=-mWzCBPgryPW14Cr8vj-oki6c_tbbOleotXsYJX_Fus1" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+    <script type="text/javascript" src="/bundles/signalR?v=UHTi4JWLFgaeIF35j3FxUxFxpohfwADMDmZABKPNoxw1" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+    <script type="text/javascript" src="/Scripts/bootstrap.bundle.min.js" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+
+    
+    <script nonce="94cdeb7f53b44d4190de54c1f3656352">
+        function AttachEventsToElement(id, eventType, listener) {
+            var elementToAttachTo = document.getElementById(id);
+            if (elementToAttachTo != null) {
+                elementToAttachTo.addEventListener(eventType, function (e) {
+                    if (this.getAttribute('aria-disabled') === 'true') {
+                        e.preventDefault();
+                        return;
+                    }
+                    listener.call(this, e);
+                });
+            }
+        }
+
+        // Global resources loaded from server-side cache (culture-aware)
+        window.GlobalResources = {"AccessibilitySettings_AltTextBlank":"The alt text is blank","AccessibilitySettings_AltTextConfigured":"Alt Text Configured","AccessibilitySettings_FilterRemoved":"filter removed","AccessibilitySettings_FiltersApplied":"Filters have been applied.","AccessibilitySettings_FiltersReset":"Filters have been reset.","AccessibilitySettings_NewsItems":"News Items","AccessibilitySettings_PaymentTypes":"Payment Types","AccountLogin_UsernamePasswordNotBeEmpty":"Username or Password can not be empty!","BookingCancellation_LoadingText":"Cancelling...","BookingDateSelector_NextDates":"Next dates","BookingDateSelector_NextDatesLoaded":"Next dates shown","BookingDateSelector_PreviousDates":"Previous dates","BookingDateSelector_PreviousDatesLoaded":"Previous dates shown","BookingProductDetails_Slot_BookNow":"Book Now","BookingSlot_BookingText":"Booking...","Cart_ProcessingPayment":"Processing Payment...","Cart_RefreshingCart":"Refreshing cart...","Dependants_Register":"Register","Dependants_Register_Tooltip":"Family member selection required","DependantsPartial_UpdateWaitlist":"Update Waitlist","Facility_Occupancy_Edit":"Actions available after count change","FusionAgent_EventStillRunning":"Event(s) are still running.","FusionAgent_ExportTaskSubmitted":"CBORD File Export task submitted!","FusionAgent_RunningEventNotVerify":"Cannot verify that agent is running.","FusionAgent_RunningSuccess":"Accrual Will run momentarily!","Global_AllDay":"All Day","Global_AlreadyAdded":"Already Added","Global_Confirm":"Confirm","Global_Error":"Error","Global_InvalidRequest":"Invalid request","Global_Loading":"Loading","Global_Max":"Max","Global_Next":"Next","Global_NotSupplied":"Not Supplied","Global_NoUpcomingEvents":"You have no upcoming events.","Global_Online":"Online","Global_Previous":"Previous","Global_Remove":"Remove","Global_Selected":"Selected","Global_ServerError":"Server error:","Global_SomethingWentWrong":"Something went wrong!","Global_Submit":"Submit","GroupRegistration_RegistrantImgAltText":"Image for","InvoiceDetail_InvoiceTotal":"Invoice Total","Layout_Loading":"Loading...","MemberRegistration_NumOfUpcoming":"You have {0} upcoming events.","Membership_Service_Duration":"Select at least one Service Duration","Notification_CheckInError_UnableToCheckIn":"Unable to check user in","PaymentProvider_InProduction":"In Production","PaymentProvider_InTest":"In Test","Profile":"Profile","Profile_FailedToLoadAddress":"Failed to load address information. Please refresh.","Profile_FailedToLoadEmailInformation":"Failed to load email information. Please refresh.","Profile_FailedToLoadNumber":"Failed to load phone number information. Please refresh.","Profile_RegistrationCanceled":"Registration has been successfully canceled.","Profile_RemovedFromWaitlist":"Successfully removed from waitlist.","Profile_UnableToAddGender":"We were unable to add gender information. (Validation: Field cannot be empty)","Profile_UnableToSaveChanges":"We were unable to save your changes. If this problem persists please contact an admin.","Profile_UpdatedFamily":"We successfully updated your family.","ReCaptcha_Confirming":"Confirming...","Registration_Step_Payment_Option":"Select Payment Option","Registration_Step_Payment_Waivers":"Accept Waivers","Stripe_PaymentNotSuccessful":"Your payment was not successful, please try again.","Stripe_PaymentProcessing":"Your payment is processing.","Stripe_PaymentSucceeded":"Payment succeeded!","User_Login_Credentials":"Enter your login credentials","WaiverPage_ExpandWaiver":"Expand Waiver","WaiverPage_MinimizeWaiver":"Minimize Waiver"};
+
+        // Date format for DevExtreme datepickers (culture-aware)
+        window.InnosoftDateFormat = 'E, MMM d yyyy';
+        window.InnosoftDateTimeFormat = 'E, MMM d yyyy h:mm a';
+
+        /**
+         * Extracts a localized resource value from page-level or global resources.
+         * param {string} key - The resource key to look up (e.g., "Global_Loading")
+         * returns {string} The localized string, or "[Missing: key]" if not found
+         **/
+        window.extractResourceValue = function (key) {
+            // 1. Check page-level resource first
+            if (typeof PageResources !== "undefined" && key in PageResources) {
+                return PageResources[key];
+            }
+
+            // 2. Then global resources
+            if (typeof GlobalResources !== "undefined" && key in GlobalResources) {
+                return GlobalResources[key];
+            }
+
+            return "[Missing: " + key + "]";
+        };
+
+    </script>
+
+            <link href="/Themes/activetheme.css?v=1231190000" rel="stylesheet" type="text/css" />
+
+
+    <script type="text/javascript" src="/Scripts/spin.min.js" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+        <script nonce="94cdeb7f53b44d4190de54c1f3656352" async src="https://www.googletagmanager.com/gtag/js?id=UA-54693831-2"></script>
+        <script nonce="94cdeb7f53b44d4190de54c1f3656352">
+            window.dataLayer = window.dataLayer || [];
+            function gtag() { dataLayer.push(arguments); }
+            gtag('js', new Date());
+			gtag('config', 'UA-54693831-2', { 'cookie_flags': 'SameSite=None;Secure'});
+        </script>
+
+
+
+        <script type="text/javascript" src="/Scripts/flushTokensFromLocalStorage.js" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+
+</head>
+
+<body>
+    <a id="skipLink" class="skip-main" href="#mainContent">Skip to main content</a>
+    <div class="wrapper">
+
+<nav id="sidebar" tabindex="-1" class="" aria-hidden="true" aria-label="Site Navigation">
+	<div id="sidebarHeader" class="TopBarBG">
+        <div class="d-flex align-items-center h-100">
+            <div id="sidebarDismiss" aria-label="Close" class="SideBarMenuLink SideBarMenuLinkColor" tabindex="-1" role="button">
+                <span class="material-icons-round md-24" aria-hidden="true">clear</span>
+            </div>
+            <script nonce="94cdeb7f53b44d4190de54c1f3656352" type="text/javascript"> AttachEventsToElement('sidebarDismiss', 'keydown', function(){enterToClick(event)}); 
+</script>
+
+    <div>
+        <a href="/" class="LogoLink" id="sidebarLogo" aria-label="Home" tabindex="-1"></a>
+    </div>
+
+        </div>
+	</div>
+
+	<div id="sidebarBody" class="overflow-auto pb-4 ScrollSmall">
+		<div class="list-unstyled list-group components">
+					<a class="sidebarMenuItem list-group-item-action" href="../Program/GetProducts?classification=96aba661-60ee-4953-a190-35233bad5f10" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">sports</span>
+							<span class="sidebarText">Open Recreation Programs and Swim Times</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../CourtReservation" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">pending_actions</span>
+							<span class="sidebarText">Squash Court Reservations</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../program?classificationId=66dcae90-f38b-46d3-9d03-2fb18a6f1563" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">schedule</span>
+							<span class="sidebarText">Free Programs and Try It Sessions</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Product/GetProducts/?productTypeCV=00000000-0000-0000-0000-000000003502&amp;classification=FBD46C72-02F1-4206-A068-1FA6DC59DAC2" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">child_care</span>
+							<span class="sidebarText">Camps</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem sidebarParentMenuItem list-group-item-action d-inline-flex align-items-center" href="#nav-5d29e1db-a5a0-4fca-ae6b-dde3a1408f98" data-bs-toggle="collapse" aria-controls="nav-5d29e1db-a5a0-4fca-ae6b-dde3a1408f98" aria-expanded="false">
+						<div class="d-inline-flex align-items-top w-100">
+							<span class="material-icons-round" aria-hidden="true">sports</span>
+							<span class="sidebarText me-2">Intramurals</span>
+							<span class="visually-hidden">submenu</span>
+						</div>
+					</a>
+					<div class="collapse list-unstyled list-group sideBarSubMenu" id="nav-5d29e1db-a5a0-4fca-ae6b-dde3a1408f98">
+							<a class="sidebarSubMenuItem list-group-item-action" href="https://warrior.uwaterloo.ca/Program?classificationId=9ca82d75-1e62-4ec5-9bf0-33d720fe485b" target="_self" >
+								<div class="d-inline-flex" >
+									<span class="material-icons-round" aria-hidden="true">how_to_reg</span>
+									<span class="sidebarText">Register as an Individual</span>
+								</div>
+							</a>
+							<a class="sidebarSubMenuItem list-group-item-action" href="https://athletics.uwaterloo.ca/sports/2024/8/29/fusionplay.aspx" target="_self" >
+								<div class="d-inline-flex" >
+									<span class="material-icons-round" aria-hidden="true">sports</span>
+									<span class="sidebarText">Fusion Play</span>
+								</div>
+							</a>
+							<a class="sidebarSubMenuItem list-group-item-action" href="https://athletics.uwaterloo.ca/sports/2022/4/27/intramurals.aspx" target="_self" >
+								<div class="d-inline-flex" >
+									<span class="material-icons-round" aria-hidden="true">sports</span>
+									<span class="sidebarText">General Intramural Information</span>
+								</div>
+							</a>
+							<a class="sidebarSubMenuItem list-group-item-action" href="https://warrior.uwaterloo.ca/membership/index" target="_self" >
+								<div class="d-inline-flex" >
+									<span class="material-icons-round" aria-hidden="true">sports</span>
+									<span class="sidebarText">Register Team</span>
+								</div>
+							</a>
+					</div>
+					<a class="sidebarMenuItem list-group-item-action" href="../Product/GetProducts/?productTypeCV=00000000-0000-0000-0000-000000003502&amp;classification=00000000-0000-0000-0000-000000026001" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">pool</span>
+							<span class="sidebarText">Aquatics</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../membership/index" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">self_improvement</span>
+							<span class="sidebarText">Clubs, Fitness, Golf, Climbing, Esports &amp; SEF Memberships</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Program/GetProducts?classification=00000000-0000-0000-0000-000000026002" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">link</span>
+							<span class="sidebarText">Group Fitness Class Reservations</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Program/GetProgramDetails?courseId=96652727-301e-4456-b19c-5ddac9ff3ba1&amp;semesterId=875edabf-1182-42a8-b187-157092f2d1c9" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">link</span>
+							<span class="sidebarText">Climbing Wall Reservations</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="https://warrior.uwaterloo.ca/Program/GetProducts?classification=ed824741-7d4d-4bbd-9591-baa4c6a3cfee" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">link</span>
+							<span class="sidebarText">Club Sessions</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="https://warrior.uwaterloo.ca/Facility/ReservationRequest" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">sports_golf</span>
+							<span class="sidebarText">Golf Simulator</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Program/GetProducts?classification=400ebcd6-5251-456d-bb9e-dad9ff833226" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">link</span>
+							<span class="sidebarText">Instructional</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Product/GetProducts/?productTypeCV=00000000-0000-0000-0000-000000003502&amp;classification=581677F9-6F35-4B2E-83EA-79D423E6D7B8" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">medical_services</span>
+							<span class="sidebarText">First Aid</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Program/GetProducts?classification=5ecf6f84-06b5-4160-8faa-1e2fe1583133" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">link</span>
+							<span class="sidebarText">Making Space - Equity Deserving Programs</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="https://warrior.uwaterloo.ca/MultiVisitPass/GetProducts?category=49f93b3d-dbdc-407e-843d-ec2ab1f68c97" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">book_online</span>
+							<span class="sidebarText">Personal Training</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Program/GetProducts?classification=db360139-29fa-4824-b1f1-7b26ed50002d" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">link</span>
+							<span class="sidebarText">Weight Training Classes</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Program/GetProducts?classification=8520a739-eede-4d0e-9f9e-2b48743acb0b" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">sports_esports</span>
+							<span class="sidebarText">Esports</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="https://warrior.uwaterloo.ca/Program/GetProducts?classification=e1ecd9c2-5b09-4b04-a4bd-c59a44d2ab99" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">sports_kabaddi</span>
+							<span class="sidebarText">Staff Excellence Fund Classes</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Program/GetProducts?classification=9d470354-7669-457e-9976-5b4cf2b09393" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">schedule</span>
+							<span class="sidebarText">Varsity Events</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../app/equipment-rentals" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">sports_basketball</span>
+							<span class="sidebarText">Equipment Rentals</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="../Facility" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">business</span>
+							<span class="sidebarText">Facility Schedules</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="https://warrior.uwaterloo.ca/Program?classificationId=d1023d46-40d1-4025-b788-53bbc1f34981" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">sports_hockey</span>
+							<span class="sidebarText">KMHA</span>
+						</div>
+					</a>
+					<a class="sidebarMenuItem list-group-item-action" href="https://warrior.uwaterloo.ca/FacilityOccupancy" target="_self" >
+						<div class="d-inline-flex">
+							<span class="material-icons-round" aria-hidden="true">fact_check</span>
+							<span class="sidebarText">Facility Occupancy</span>
+						</div>
+					</a>
+					</div>
+	</div>
+</nav>
+
+<script nonce="94cdeb7f53b44d4190de54c1f3656352">
+    var keys = {
+        tab: 9,
+        esc: 27,
+        space: 32
+	};
+
+	$(document).ready(function () {
+		$('#sidebarDismiss, .overlay').on('click', function () {
+			dismissSidebar();
+		});
+
+		$('#sidebarCollapse').on('click', function () {
+			showSidebar();
+		});
+
+		$('#sidebarCollapse').on('keydown', function (event) {
+			if (event.keyCode === keys.space) {
+				event.preventDefault();
+				showSidebar();
+			}
+		});
+
+		$('#sidebarDismiss').on('keydown', function (event) {
+			if (event.keyCode === keys.space) {
+				event.preventDefault();
+				dismissSidebar();
+			}
+		});
+
+        $('#sidebarDismiss, #sidebarLogo, .sidebarMenuItem').on("keydown", function (event) {
+            switch (event.keyCode) {
+                case keys.esc:
+                    dismissSidebar()
+                    break;
+            }
+		});
+
+        $(".sidebarMenuItem:last-of-type").on("keydown", function (event) {
+            if (event.keyCode === keys.tab) {
+                event.preventDefault();
+                $('#sidebarDismiss').focus();
+            }
+		});
+
+        $('.sidebarMenuItem').attr('tabindex', '-1');
+	});
+
+	function dismissSidebar() {
+		// hide sidebar
+		$('#sidebar').removeClass('active');
+        $('#sidebar').attr('aria-hidden','true')
+		$('#sidebarCollapse').attr('aria-expanded', 'false').focus();
+
+		if (typeof nvdaAnnounce === 'function')
+			nvdaAnnounce($('#sidebarCollapse').attr('aria-label') + ' collapsed');
+
+		// hide overlay
+		$('.overlay').removeClass('active');
+		$('.sideBarSubMenu.show').toggleClass('show');
+
+		$('html').removeClass("overflow-hidden");
+		$('#sidebarDismiss').attr('tabindex', '-1');
+		$('#sidebarLogo').attr('tabindex', '-1');
+		$('.sidebarMenuItem').attr('tabindex', '-1');
+	}
+
+	function showSidebar() {
+		// open sidebar
+		$('#sidebar').addClass('active');
+        $('#sidebar').attr('aria-hidden', 'false')
+		$('#sidebarCollapse').attr('aria-expanded', 'true');
+
+		if (typeof nvdaAnnounce === 'function')
+			nvdaAnnounce($('#sidebarCollapse').attr('aria-label') + ' expanded');
+		// fade in the overlay
+		$('.overlay').addClass('active');
+		$('a[aria-expanded=true]').attr('aria-expanded', 'false');
+		$(".sidebarMenuItem").first().focus();
+
+		$('html').addClass("overflow-hidden");
+		$('#sidebarDismiss').attr('tabindex', '0');
+		$('#sidebarLogo').attr('tabindex', '0');
+        $(".sidebarMenuItem").attr('tabindex', '0');
+	}   
+</script>
+
+
+        <div id="content">
+
+<div id="SessionTimeoutContainer">
+    <input hidden value="20" id="SessionTimeoutMins" />
+</div>
+
+
+<div class="modal fade" id="inactivityIdleWarning" tabindex="-1" aria-labelledby="inactivityTimeoutWarning" aria-hidden="true" data-backdrop="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title global-Modal-Header-H5-FontSize" id="inactivityTimeoutWarning">Are you still there?</h2>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Would you like to continue? Your session will expire in 2 mins due to inactivity.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary resetInactivityModalBtn">Continue</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script nonce="94cdeb7f53b44d4190de54c1f3656352" type="text/javascript">
+    $(".resetInactivityModalBtn").on('click', function () {
+        resetSessionAuthentication();
+    });
+</script>
+
+            <div class="navbar TopBar navbar-expand sticky-top TopBarBG" role="banner">
+                <div  class="container-fluid">
+                    <div class="d-flex align-items-center h-100">
+                        <div id="sidebarCollapse" class="SideBarMenuLink SideBarMenuLinkColor" aria-expanded="false" aria-controls="sidebar" aria-label="Open Site Navigation" tabindex="0" role="button">
+                            <span class="material-icons-round" aria-hidden="true">menu</span>
+                        </div>
+                        <script nonce="94cdeb7f53b44d4190de54c1f3656352" type="text/javascript"> AttachEventsToElement('sidebarCollapse', 'keydown', function(){enterToClick(event)}); 
+</script>
+
+    <div>
+        <a href="/" class="LogoLink" id="LogoBackground" aria-label="Home" tabindex="0"></a>
+    </div>
+
+                    </div>
+                    <div id="Search" class="d-none d-lg-block TopSearch">
+<form action="/Program/Search" aria-label="Main" id="SearchForm" method="post" role="search"><input name="__RequestVerificationToken" type="hidden" value="STH81lsZMjQcGmcnbjhKJdXn6GbKD0J8YSCBKsGFWuG9WjnOPtD4pmA-hNN0Xwd5S88Bg64ncNJs33quUyBOTgzixziAgc0GsXu4nQNwa5U1" /><div class="input-group">
+    <input type="text" id="txtSearchId" name="term" class="form-control" aria-label="Search Programs" placeholder="Search Programs" onsearch="SearchKey(event)" required>
+    <button id="btnSearch" class="btn btn-outline-secondary SearchButtonColor" type="submit" aria-label="Submit Search"><span class="material-icons-round md-18" aria-hidden="true">search</span></button>
+</div>
+</form>                    </div>
+
+                    <div id="TopBarRight" class="d-flex align-items-center h-100">
+                        <div class="d-lg-none">
+                            <a id="lnkSearch" href="#SearchCl" data-bs-toggle="collapse" aria-label="Search" class="btn btn-link SearchButton TopBarButtonColor" aria-expanded="false" aria-controls="SearchCl">
+                                <span class="material-icons-round" aria-hidden="true">search</span>
+                            </a>
+                        </div>
+                        
+    <a class="TopBarButtonColor LoginPartialLinks btn btn-link" href="/account/signin?returnUrl=%252fFacility%252fGetSchedule%253ffacilityId%253d7c59cbfb-ea06-46e0-8ec7-06739ccaec45">Sign In</a>
+
+<script nonce='94cdeb7f53b44d4190de54c1f3656352' src='https://www.google.com/recaptcha/api.js?render=6Lf5FNkaAAAAAFu5NZETYWSt6GU_ZVwH5UyX1kIz'></script><script type='text/javascript' nonce='94cdeb7f53b44d4190de54c1f3656352' src='/Scripts/InnoSoftReCaptcha.js?v=1001164922'></script>        <script nonce="94cdeb7f53b44d4190de54c1f3656352" type="text/javascript">
+     PopulateSiteKeys('6Lf5FNkaAAAAAFu5NZETYWSt6GU_ZVwH5UyX1kIz', '6LdXFtkaAAAAALd2tiAxIExRLPO_aqtgP7Ig8xKS');
+        </script>
+
+                    </div>
+                </div>
+            </div>
+
+
+<div class="container-fluid HeaderBar HeaderBarBg">
+    <div id="ecHeader" class="editableCustomContent row" data-id="00000000-0000-0000-0000-000000004189">
+        <div class="container">
+<div class="stripe"></div>
+</div>
+    </div>
+</div>
+
+            <div class="collapse" id="SearchCl" role="search">
+<form action="/Program/Search" aria-label="Main" id="SearchFormXS" method="post" role="search"><input name="__RequestVerificationToken" type="hidden" value="dDbsmyiJqpQ84zTJapWE12b0yZXjr6h9LT3cMRHltT0EFYaN-IzSyhZvUpSR__4tRU2IrLOPTeU5mbFOK8npckQ-A8MH8iDxgU2pOJHTWsk1" /><div class="input-group">
+    <input type="text" id="txtSearchClId" name="term" class="form-control" aria-label="Search Programs" placeholder="Search Programs" required>
+    <script nonce="94cdeb7f53b44d4190de54c1f3656352" type="text/javascript"> AttachEventsToElement('txtSearchClId', 'search', function(){SearchKeyXS(event)}); 
+</script>
+    <button id="btnSearchSm" class="btn btn-outline-secondary SearchButtonColor" type="submit" aria-label="Submit Search"><span class="material-icons-round" aria-hidden="true">search</span></button>
+</div></form>            </div>
+
+
+
+            <div id="main" role="main">
+                
+
+
+                <div class="container-fluid body-content bodyColour contentWrapPP" id="mainContent">
+                    <div id="cookieArea"></div>
+                    <div>
+
+                            <div class="TitleDiv d-flex justify-content-between mb-3 mt-3">
+                                <div class="top">
+                                    <h1>
+                                        Facility Schedule
+                                        <br />
+                                    </h1>
+                                </div>
+                                <div class="">
+
+                                </div>
+                            </div>
+
+                        
+
+
+<script type="text/javascript" src="/bundles/calendar?v=qPV-9_eDefrRB4Eh7Kfpl25eW76JPUGrwAuA9hns3DI1" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+<link href="/Content/DevExtremeCalendar?v=T4QzKhkVYUM4yz60QOcTrgtWOgCyRwf0YkA4IwiY0Pc1" rel="stylesheet"/>
+
+
+<div>
+    <div class="mb-3">
+        <label for="SelectedFacility" class="form-label">Facility</label>
+        <select class="form-select" data-val="true" data-val-required="The SelectedFacility field is required." id="SelectedFacility" name="SelectedFacility"><option value="">All Facilities</option>
+<option value="24a3d7f2-7842-4f03-92a9-ffa08bfbf494">All Facilities &gt;  CIF Building Hours</option>
+<option value="2ddaf8e7-4fc7-4d31-a664-f04b86c78774">All Facilities &gt;  PAC Building Hours</option>
+<option value="c041c516-e497-4444-a03b-ef3c0bd3036d">All Facilities &gt; Physical Activities Complex &gt; Activity Area</option>
+<option value="19144f45-7d2b-4f5e-81ed-798c31ef49f5">All Facilities &gt; Field House &gt; Beach Volleyball Courts &gt; Beach Volleyball Court 1</option>
+<option value="9eda4217-4d2a-471d-a95b-24e0b149ddf4">All Facilities &gt; Field House &gt; Beach Volleyball Courts &gt; Beach Volleyball Court 2</option>
+<option value="95d0706a-3c97-46a6-a6ce-699b0acc7fc3">All Facilities &gt; Field House &gt; Beach Volleyball Courts &gt; Beach Volleyball Court 3</option>
+<option value="6f60aca9-7fba-4bf1-b6af-1f85e9376462">All Facilities &gt; CIF Arena</option>
+<option value="b2d98ff8-e37a-42da-bf72-06b259ff1a2c">All Facilities &gt; Columbia Icefield Building &gt; CIF Fitness Centre</option>
+<option value="c3b234ff-c492-4df0-90b2-08b95850c9e9">All Facilities &gt; Field House &gt; Playing Fields &gt; CIF Grass Field 1</option>
+<option value="51618221-713e-40ee-b133-5003503dd7cf">All Facilities &gt; Field House &gt; Playing Fields &gt; CIF Grass Field 2</option>
+<option value="abcbaa33-bfc8-4054-87ca-67c3aa0a6a13">All Facilities &gt; Field House &gt; Playing Fields &gt; CIF Grass Field 3/4 &amp; Baseball</option>
+<option value="d9b13b32-adc7-47b2-a978-84cf6dfcf976">All Facilities &gt; Field House &gt; Playing Fields &gt; CIF Grass Field 7</option>
+<option value="a26cd06f-2f4e-4ec7-b946-0985984ba255">All Facilities &gt; Columbia Icefield Building &gt; CIF Gyms &gt; CIF Gym 1</option>
+<option value="bfddec09-d9a6-4915-8aac-f97b28f95d0d">All Facilities &gt; Columbia Icefield Building &gt; CIF Gyms &gt; CIF Gym 2</option>
+<option value="3df2fa09-2866-49e3-8526-6705450be265">All Facilities &gt; Columbia Icefield Building &gt; CIF Gyms &gt; CIF Gym 3</option>
+<option value="d53bddc9-7289-46a1-b9c2-b676275eeec8">All Facilities &gt; Columbia Icefield Building &gt; CIF Meeting Room</option>
+<option value="22529c27-ba7f-45b9-a331-c9a38d56ef80">All Facilities &gt; Columbia Icefield Building &gt; CIF Studio</option>
+<option value="dc963254-55db-4fa9-bea9-dd54c140a8f5">All Facilities &gt; Field House &gt; Playing Fields &gt; CIF Warrior Field</option>
+<option value="23b5e227-47c7-4b15-a23f-171ab95437c6">All Facilities &gt; Field House &gt; Playing Fields &gt; Disc Golf Course</option>
+<option value="9f0010ea-3844-4c2a-9357-68db5149cda7">All Facilities &gt; Physical Activities Complex &gt; Meeting Rooms &gt; PAC 2021 &gt; Esports &amp; Gaming Lounge - PC&#39;s</option>
+<option value="a2470745-a285-4531-98d2-f29f8d2fa289">All Facilities &gt; Field House &gt; Indoor Fields &gt; Field House Field A</option>
+<option value="1e240bca-14f3-4da3-a89e-336c92bc4843">All Facilities &gt; Field House &gt; Indoor Fields &gt; Field House Field B</option>
+<option value="c3258c1f-6453-4692-bb30-88748c12534a">All Facilities &gt; Field House &gt; Indoor Fields &gt; Field House Field C</option>
+<option value="b31ff970-d040-4dc3-b6f6-05cb03f8b94c">All Facilities &gt; Physical Activities Complex &gt; Golf Simulator</option>
+<option selected="selected" value="7c59cbfb-ea06-46e0-8ec7-06739ccaec45">All Facilities &gt; Physical Activities Complex &gt; PAC Fitness Centre &gt; PAC - 1st Floor - Free Weights</option>
+<option value="b03ac6cb-b6ec-4fd4-bd21-e9872a3a43f3">All Facilities &gt; Physical Activities Complex &gt; PAC Fitness Centre &gt; PAC - 1st Floor - Functional</option>
+<option value="db0e08e1-faa7-4bc5-b639-088d7642a53e">All Facilities &gt; Physical Activities Complex &gt; PAC Fitness Centre &gt; PAC - 2nd Floor - Cardio</option>
+<option value="b08d4801-c28c-4eba-8602-8e904ae0568c">All Facilities &gt; Physical Activities Complex &gt; PAC Fitness Centre &gt; PAC - 2nd Floor - Weight Machines</option>
+<option value="37491bf2-2b69-429c-a754-4407d77da839">All Facilities &gt; Physical Activities Complex &gt; Meeting Rooms &gt; PAC 1001</option>
+<option value="58b4988f-fb79-42f9-bd19-f7dbb6c8eab7">All Facilities &gt; Physical Activities Complex &gt; Squash Courts &gt; PAC Court 1 (International)</option>
+<option value="5e568875-dadf-47bb-9080-ad4c4df145c1">All Facilities &gt; Physical Activities Complex &gt; Squash Courts &gt; PAC Court 1 (North American)</option>
+<option value="b2eacfee-0fad-4fa1-a4bd-609bfe3ca532">All Facilities &gt; Physical Activities Complex &gt; Squash Courts &gt; PAC Court 2 (International)</option>
+<option value="f8162fb1-c828-431b-a6f8-c1bab9927b61">All Facilities &gt; Physical Activities Complex &gt; Squash Courts &gt; PAC Court 2 (North American)</option>
+<option value="1f7c2dc8-ea2b-4c9d-b211-b46a78f2014d">All Facilities &gt; Physical Activities Complex &gt; PAC Fitness Centre</option>
+<option value="a3e9c00d-5aa7-45ea-ad73-f62c293856a8">All Facilities &gt; Physical Activities Complex &gt; PAC Main Gym</option>
+<option value="5d72208a-069d-4931-aaa6-9527346efc6f">All Facilities &gt; Physical Activities Complex &gt; PAC Pool</option>
+<option value="4c8a432d-409a-46eb-a1f5-a92bf3b609a2">All Facilities &gt; Physical Activities Complex &gt; PAC Small Gym</option>
+<option value="163fb3bf-abf5-45b2-8340-ff22ae8b9ad1">All Facilities &gt; Physical Activities Complex &gt; PAC Studios &gt; PAC Studio 1</option>
+<option value="8790ee63-595f-40e9-9735-a325903b186c">All Facilities &gt; Physical Activities Complex &gt; PAC Studios &gt; PAC Studio 2</option>
+<option value="bf76ecfc-d619-41bf-8e4b-f2158c1b6471">All Facilities &gt; Physical Activities Complex &gt; PAC Studios &gt; PAC Studio 3</option>
+<option value="64284919-2dd7-4758-bb03-3d632071bd31">All Facilities &gt; Physical Activities Complex &gt; PAC Village Green</option>
+<option value="70dad426-928f-478d-b8c6-6e3784446de8">All Facilities &gt; Physical Activities Complex &gt; Rock Climbing Wall</option>
+<option value="ce0c1830-d42e-49bf-81fb-41743d1c1386">All Facilities &gt; Physical Activities Complex &gt; Spin Studio</option>
+<option value="f30dc951-26b0-4909-b814-ce54d38c2fbb">All Facilities &gt; Physical Activities Complex &gt; Warrior Zone</option>
+</select>
+    </div>
+
+    <div id="scheduler" role="region" aria-label="Facility Schedule">
+
+    </div>
+
+    <div id="schedulerAnnouncement" role="status" aria-live="polite" aria-atomic="true" class="visually-hidden"></div>
+
+    <script type="text/javascript" nonce="94cdeb7f53b44d4190de54c1f3656352">
+        window.PageResources = {"FacilitySchedulePage_Loaded":"Schedule loaded","FacilitySchedulePage_Loading":"Loading","FacilitySchedulePage_ViewSelected":"view selected","FacilitySchedulePage_WeekRange":"Week of {0} to {1}","Global_Next":"Next","Global_Previous":"Previous"};
+    </script>
+</div>
+                        <br />
+                    </div>
+
+
+                </div>
+
+                
+
+                <button type="button" class="cd-top btn btn-primary" aria-label="Scroll to Top">
+                    <div class="d-flex align-items-center"><span class="material-icons-round" aria-hidden="true">keyboard_arrow_up</span></div>
+                </button>
+
+                <div id="mJavascriptError" class="modal fade" tabindex="-1" aria-hidden="true" aria-labelledby="JavascriptErrorTitle">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title global-Modal-Header-H5-FontSize" id="JavascriptErrorTitle">Error</h2>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p id="JavascriptErrorDescription"></p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <input type="hidden" value="Do you want to leave this site? Changes you made may not be saved." id="hdn-navigate-away-message" />
+
+                <div id="loading" aria-label="Loading">
+                    <div id="loadingcontent" style="">
+                        <p id="loadingspinner" aria-live="polite">
+                            Loading ...
+                        </p>
+                    </div>
+                </div>
+
+                <div id="toastNote"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast position-fixed" id="accountCreationToastId" role="alert" aria-live="assertive" aria-atomic="true" data-autohide="false" aria-labelledby="accountCreationToastId-title">
+        <div class="toast-body">
+            <div class="mb-1">
+                <strong id="accountCreationToastId-title" class="me-auto">Account created!</strong>
+            </div>
+            <div class="mt-2">
+                A confirmation email will be sent to you shortly.
+            </div>
+            <div class="text-end mt-3">
+                <a href="#" class="text-body me-4" data-bs-dismiss="toast">DISMISS</a>
+                <a id="aLayoutRedirectToProfile" href="#" class="text-body" data-bs-dismiss="toast"><strong>COMPLETE PROFILE</strong></a>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast position-fixed" id="recoveredOrderToastId" role="alert" aria-live="assertive" aria-atomic="true" data-bs-autohide="false" aria-labelledby="recoveredOrderToastId-title">
+        <div class="toast-body">
+            <div class="mb-1">
+                <strong id="recoveredOrderToastId-title" class="me-auto">Order Recovered</strong>
+            </div>
+            <div class="mt-2">
+                Your previous checkout was not completed and has been recovered.
+            </div>
+            <div class="text-end mt-3">
+                <a href="#" id="recoveredOrderDismiss" class="text-body me-4" data-bs-dismiss="toast" aria-label="Close"><strong>DISMISS</strong></a>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="overlay"></div>
+    <div class="overlay-secondary"></div>
+
+<div id="ecContentFooter" data-id="00000000-0000-0000-0000-000000004193" class="editableCustomContent">
+	<div class="container">
+<div class="stripe"></div>
+</div>
+</div>
+
+
+
+<footer class="container-fluid FooterBar FooterBarBg">
+		<div id="ecFooter" class="editableCustomContent" data-id="00000000-0000-0000-0000-000000004188">
+			<p></p>
+<p><a href="https://athletics.uwaterloo.ca/sports/2020/9/1/warriors-insider-newsletter.aspx" target="_blank" rel="noopener noreferrer" title="Warrior Insider Sign Up"><img class="banner" alt="warrior insider" src="Themes/UWaterloo3.7/top_ad_banner.png" style="display: block; margin-left: auto; margin-right: auto;" width="999" height="68"></a></p>
+<div class="SchoolFooter row">
+<div class="container">
+<div class="banner" style="display: flex; justify-content: space-between;">
+<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+<div class="SchoolLogo">
+<p><a title="Waterloo Homepage" href="http://uwaterloo.ca" target="_blank" rel="noopener noreferrer"><img class="waterloo-logo" alt="Waterloo Logo" src="/Content/Images/waterloo-logo-main1.png" style="display: block; margin-left: auto; margin-right: auto;"></a></p>
+</div>
+</div>
+<div class="col-lg-4 col-md-4 col-sm-4 col-xs-12">
+<div class="SchoolLogo"><a title="Athletics and Recreation" href="http://warriors.uwaterloo.ca/" target="_blank" rel="noopener noreferrer"><img class="warrior-logo" alt="Warriors Rec Logo" src="/Content/Images/waterloo_warriors_footer_logo.png" style="float: left;"></a></div>
+</div>
+<div class="col-lg-3 col-md-4 col-sm-4 col-xs-10">
+<div class="SchoolSocial" style="margin: 10px 0px;">
+<div class="social-media-footer"><strong>Connect With Us!</strong><br>
+<ul>
+<li><a aria-label="Go to Facebook" href="https://www.facebook.com/waterloowarriors"><i title="Go to Facebook" class="fa fa-facebook"></i></a></li>
+<li><a aria-label="Go To Waterloo Warriors Twitter" href="https://twitter.com/wloowarriors"><i title="Go to Waterloo Warriors Twitter" class="fa fa-twitter">&nbsp;</i></a></li>
+<li><a aria-label="Go to photo gallery" href="http://www.instagram.com/wloowarriors"><i title="Go to photo gallery" class="fa fa-instagram"></i></a></li>
+<li><a aria-label="Go to youtube" href="http://www.youtube.com/user/uwwarriors"><i title="Go to YouTube" class="fa fa-youtube"></i></a></li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+<div class="SchoolInfo"><strong>Athletics and Recreation</strong> | University of Waterloo | 200 University Avenue West, Waterloo, ON N2L 3G1</div>
+<div class="SchoolInfo"><hr>
+<p class="MsoNormal" style="text-align: left;"><b>For transactional assistance contact us at (519) 888-4567 ext. 35869 or email<span>&nbsp;</span><a href="mailto:warriorsinfo@uwaterloo.ca">warriorsinfo@uwaterloo.ca</a>.&nbsp; </b>By making a purchase you are agreeing to our policy for <a href="https://athletics.uwaterloo.ca/sports/2010/7/21/Refund_and_Transfer_Policy.aspx" target="_blank" rel="noopener">transfers and refunds</a> - please review this page online.&nbsp;</p>
+<p class="MsoNormal" style="text-align: left;">As part of Athletics and Recreational registration process, your information (e.g. name, email address, registration details) will be processed through a secure platform provided by Fusion. Fusion&nbsp;<a href="https://www.fusionfamily.com/privacy#:~:text=We%20will%20not%20sell%20your,a%20legal%20or%20business%20purpose." target="_blank" rel="noopener">privacy policy.</a><o:p></o:p></p>
+<p class="MsoNormal" style="text-align: left;">Questions about the use of personal information by the University of Waterloo for Athletics and Recreation should be directed to Ari Grossman, Associate Director, Business Operations (519-888-4567 ext. 45433, ari.grossman@uwaterloo.ca)<o:p></o:p></p>
+<p class="MsoNormal" style="text-align: left;">The University of Waterloo processes personal information under the authority of and in accordance with the Freedom of Information and Protection of Privacy Act, the University of Waterloo Act (1972), as well as University policy and guidelines for the purposes of operating the programs and services of the University. General questions about privacy at the University of Waterloo should be directed the University's <a href="https://uwaterloo.ca/privacy/about-information-and-privacy" target="_blank" rel="noopener">Privacy Officer</a>.&nbsp;<a href="https://uwaterloo.ca/secretariat/information-and-privacy" target="_blank" rel="noopener">Learn more</a>&nbsp;about University of Waterloo Information and Privacy.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="FusionFooter row">
+<div class="container">
+<div class="row">
+<div class="col-lg-8 col-md-8 col-sm-6 col-xs-12">
+<div class="FooterLinkGroup">
+<div class="copyright copyrightTextColor">&copy; <span class="ecDateTime_Year">2026</span> Innosoft Canada. All rights reserved.</div>
+<a class="FooterLink FooterLinkColor" href="/Home/Contact">Contact Us</a> <a class="FooterLink FooterLinkColor" href="/Home/About">About Us</a> <a class="FooterLink FooterLinkColor" href="/Home/Terms">Terms Of Use</a></div>
+</div>
+<div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+<div class="FooterLogo"><a title="Powered By Fusion" href="http://www.innosoftfusion.com"> <img alt="Powered By Fusion" src="/Content/Images/Fusion-Icon-Light.png"> </a></div>
+</div>
+</div>
+</div>
+</div>
+		</div>	
+</footer>
+
+
+    
+
+    <script type="text/javascript" nonce="94cdeb7f53b44d4190de54c1f3656352">
+		document.getElementById("aLayoutRedirectToProfile").addEventListener("click", function () { redirectToProfile() });
+        document.getElementById("recoveredOrderDismiss").addEventListener("click", function () { dismissRecoveredOrder() });
+
+	var jsErrorMessages_Refresh = 'Error while loading data! Refresh page and try again!';
+	var jsErrorMessages_JSError = 'Error occured while loading data!';
+	var jsErrorMessages_Error = 'Error';
+	var InnosoftUrls = {
+		PriceAPI: '/api/Price/GetPrices',
+		ProductAPI: '/api/product'
+	};
+	var InnosoftConstants = {
+		GuidEmpty: '00000000-0000-0000-0000-000000000000'
+	};
+    </script>
+
+    <div id="section-tinymcescripts"></div>
+
+    <script type="text/javascript" src="/bundles/innosoftPostScript?v=OLJ9FMtJ-POdNjq17KB9lEmzvM10OfevmiYTG0uL0VQ1" nonce="94cdeb7f53b44d4190de54c1f3656352"></script>
+
+    
+
+    <div id="nvda-announcer" aria-live="polite" aria-atomic="true" class="visually-hidden"></div>
+
+</body>
+</html>
+

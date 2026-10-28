@@ -1,0 +1,996 @@
+[
+  {
+    "id": "24a3d7f2-7842-4f03-92a9-ffa08bfbf494",
+    "name": "CIF Building Hours",
+    "building": "CIF Building Hours",
+    "path": [
+      "CIF Building Hours"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "6:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "6:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "2ddaf8e7-4fc7-4d31-a664-f04b86c78774",
+    "name": "PAC Building Hours",
+    "building": "PAC Building Hours",
+    "path": [
+      "PAC Building Hours"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "6:00 AM - 11:30 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "6:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "c041c516-e497-4444-a03b-ef3c0bd3036d",
+    "name": "Activity Area",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Activity Area"
+    ],
+    "type": "Activity Area",
+    "area": "22474 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "19144f45-7d2b-4f5e-81ed-798c31ef49f5",
+    "name": "Beach Volleyball Court 1",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Beach Volleyball Courts",
+      "Beach Volleyball Court 1"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 8:00 PM",
+      "Monday": "8:00 AM - 8:00 PM",
+      "Tuesday": "8:00 AM - 8:00 PM",
+      "Wednesday": "8:00 AM - 8:00 PM",
+      "Thursday": "8:00 AM - 8:00 PM",
+      "Friday": "8:00 AM - 8:00 PM",
+      "Saturday": "9:00 AM - 8:00 PM"
+    }
+  },
+  {
+    "id": "9eda4217-4d2a-471d-a95b-24e0b149ddf4",
+    "name": "Beach Volleyball Court 2",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Beach Volleyball Courts",
+      "Beach Volleyball Court 2"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 8:00 PM",
+      "Monday": "8:00 AM - 8:00 PM",
+      "Tuesday": "8:00 AM - 8:00 PM",
+      "Wednesday": "8:00 AM - 8:00 PM",
+      "Thursday": "8:00 AM - 8:00 PM",
+      "Friday": "8:00 AM - 8:00 PM",
+      "Saturday": "9:00 AM - 8:00 PM"
+    }
+  },
+  {
+    "id": "95d0706a-3c97-46a6-a6ce-699b0acc7fc3",
+    "name": "Beach Volleyball Court 3",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Beach Volleyball Courts",
+      "Beach Volleyball Court 3"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 8:00 PM",
+      "Monday": "8:00 AM - 8:00 PM",
+      "Tuesday": "8:00 AM - 8:00 PM",
+      "Wednesday": "8:00 AM - 8:00 PM",
+      "Thursday": "8:00 AM - 8:00 PM",
+      "Friday": "8:00 AM - 8:00 PM",
+      "Saturday": "9:00 AM - 8:00 PM"
+    }
+  },
+  {
+    "id": "6f60aca9-7fba-4bf1-b6af-1f85e9376462",
+    "name": "CIF Arena",
+    "building": "CIF Arena",
+    "path": [
+      "CIF Arena"
+    ],
+    "type": "Ice Rink",
+    "area": "17400 Square feet",
+    "maxOccupancy": 670,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "b2d98ff8-e37a-42da-bf72-06b259ff1a2c",
+    "name": "CIF Fitness Centre",
+    "building": "Columbia Icefield Building",
+    "path": [
+      "Columbia Icefield Building",
+      "CIF Fitness Centre"
+    ],
+    "type": "Fitness Centre",
+    "area": "6000 Square feet",
+    "maxOccupancy": 100,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "c3b234ff-c492-4df0-90b2-08b95850c9e9",
+    "name": "CIF Grass Field 1",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Playing Fields",
+      "CIF Grass Field 1"
+    ],
+    "type": "Playing Field",
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 8:00 PM",
+      "Monday": "7:00 AM - 8:00 PM",
+      "Tuesday": "7:00 AM - 8:00 PM",
+      "Wednesday": "7:00 AM - 8:00 PM",
+      "Thursday": "7:00 AM - 8:00 PM",
+      "Friday": "7:00 AM - 8:00 PM",
+      "Saturday": "9:00 AM - 8:00 PM"
+    }
+  },
+  {
+    "id": "51618221-713e-40ee-b133-5003503dd7cf",
+    "name": "CIF Grass Field 2",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Playing Fields",
+      "CIF Grass Field 2"
+    ],
+    "type": "Playing Field",
+    "area": "25200 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 8:00 PM",
+      "Monday": "7:00 AM - 8:00 PM",
+      "Tuesday": "7:00 AM - 8:00 PM",
+      "Wednesday": "7:00 AM - 8:00 PM",
+      "Thursday": "7:00 AM - 8:00 PM",
+      "Friday": "7:00 AM - 8:00 PM",
+      "Saturday": "9:00 AM - 8:00 PM"
+    }
+  },
+  {
+    "id": "abcbaa33-bfc8-4054-87ca-67c3aa0a6a13",
+    "name": "CIF Grass Field 3/4 & Baseball",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Playing Fields",
+      "CIF Grass Field 3/4 & Baseball"
+    ],
+    "type": "Playing Field",
+    "area": "25200 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 8:00 PM",
+      "Monday": "6:00 AM - 8:00 PM",
+      "Tuesday": "6:00 AM - 8:00 PM",
+      "Wednesday": "6:00 AM - 8:00 PM",
+      "Thursday": "6:00 AM - 8:00 PM",
+      "Friday": "6:00 AM - 8:00 PM",
+      "Saturday": "9:00 AM - 8:00 PM"
+    }
+  },
+  {
+    "id": "d9b13b32-adc7-47b2-a978-84cf6dfcf976",
+    "name": "CIF Grass Field 7",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Playing Fields",
+      "CIF Grass Field 7"
+    ],
+    "type": "Playing Field",
+    "area": "25200 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 8:00 PM",
+      "Monday": "6:00 AM - 8:00 PM",
+      "Tuesday": "6:00 AM - 8:00 PM",
+      "Wednesday": "6:00 AM - 8:00 PM",
+      "Thursday": "6:00 AM - 8:00 PM",
+      "Friday": "6:00 AM - 8:00 PM",
+      "Saturday": "9:00 AM - 8:00 PM"
+    }
+  },
+  {
+    "id": "a26cd06f-2f4e-4ec7-b946-0985984ba255",
+    "name": "CIF Gym 1",
+    "building": "Columbia Icefield Building",
+    "path": [
+      "Columbia Icefield Building",
+      "CIF Gyms",
+      "CIF Gym 1"
+    ],
+    "type": "Gymnasium",
+    "area": "5760 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "bfddec09-d9a6-4915-8aac-f97b28f95d0d",
+    "name": "CIF Gym 2",
+    "building": "Columbia Icefield Building",
+    "path": [
+      "Columbia Icefield Building",
+      "CIF Gyms",
+      "CIF Gym 2"
+    ],
+    "type": "Gymnasium",
+    "area": "5760 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "3df2fa09-2866-49e3-8526-6705450be265",
+    "name": "CIF Gym 3",
+    "building": "Columbia Icefield Building",
+    "path": [
+      "Columbia Icefield Building",
+      "CIF Gyms",
+      "CIF Gym 3"
+    ],
+    "type": "Gymnasium",
+    "area": "6076 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "d53bddc9-7289-46a1-b9c2-b676275eeec8",
+    "name": "CIF Meeting Room",
+    "building": "Columbia Icefield Building",
+    "path": [
+      "Columbia Icefield Building",
+      "CIF Meeting Room"
+    ],
+    "type": "Meeting Room",
+    "area": null,
+    "maxOccupancy": 30,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:30 PM",
+      "Monday": "7:00 AM - 11:30 PM",
+      "Tuesday": "7:00 AM - 11:30 PM",
+      "Wednesday": "7:00 AM - 11:30 PM",
+      "Thursday": "7:00 AM - 11:30 PM",
+      "Friday": "7:00 AM - 11:30 PM",
+      "Saturday": "9:00 AM - 11:30 PM"
+    }
+  },
+  {
+    "id": "22529c27-ba7f-45b9-a331-c9a38d56ef80",
+    "name": "CIF Studio",
+    "building": "Columbia Icefield Building",
+    "path": [
+      "Columbia Icefield Building",
+      "CIF Studio"
+    ],
+    "type": "Studio",
+    "area": "1458 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:30 AM - 11:30 PM",
+      "Monday": "8:30 AM - 11:30 PM",
+      "Tuesday": "8:30 AM - 11:30 PM",
+      "Wednesday": "8:30 AM - 11:30 PM",
+      "Thursday": "8:30 AM - 11:30 PM",
+      "Friday": "8:30 AM - 10:30 PM",
+      "Saturday": "9:30 AM - 6:30 PM"
+    }
+  },
+  {
+    "id": "dc963254-55db-4fa9-bea9-dd54c140a8f5",
+    "name": "CIF Warrior Field",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Playing Fields",
+      "CIF Warrior Field"
+    ],
+    "type": "Stadium",
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "23b5e227-47c7-4b15-a23f-171ab95437c6",
+    "name": "Disc Golf Course",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Playing Fields",
+      "Disc Golf Course"
+    ],
+    "type": "Disc Golf Course",
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "12:00 AM - 11:59 PM",
+      "Monday": "12:00 AM - 11:59 PM",
+      "Tuesday": "12:00 AM - 11:59 PM",
+      "Wednesday": "12:00 AM - 11:59 PM",
+      "Thursday": "12:00 AM - 11:59 PM",
+      "Friday": "12:00 AM - 11:59 PM",
+      "Saturday": "12:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "9f0010ea-3844-4c2a-9357-68db5149cda7",
+    "name": "Esports & Gaming Lounge - PC's",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Meeting Rooms",
+      "PAC 2021",
+      "Esports & Gaming Lounge - PC's"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": 20,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "Closed",
+      "Monday": "12:00 - 10:00 PM",
+      "Tuesday": "12:00 - 10:00 PM",
+      "Wednesday": "12:00 - 10:00 PM",
+      "Thursday": "12:00 - 10:00 PM",
+      "Friday": "12:00 - 7:00 PM",
+      "Saturday": "Closed"
+    }
+  },
+  {
+    "id": "a2470745-a285-4531-98d2-f29f8d2fa289",
+    "name": "Field House Field A",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Indoor Fields",
+      "Field House Field A"
+    ],
+    "type": "Indoor Turf Field",
+    "area": "65000 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "1e240bca-14f3-4da3-a89e-336c92bc4843",
+    "name": "Field House Field B",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Indoor Fields",
+      "Field House Field B"
+    ],
+    "type": "Indoor Turf Field",
+    "area": "65000 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "c3258c1f-6453-4692-bb30-88748c12534a",
+    "name": "Field House Field C",
+    "building": "Field House",
+    "path": [
+      "Field House",
+      "Indoor Fields",
+      "Field House Field C"
+    ],
+    "type": "Indoor Turf Field",
+    "area": "65000 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:30 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "b31ff970-d040-4dc3-b6f6-05cb03f8b94c",
+    "name": "Golf Simulator",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Golf Simulator"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "7c59cbfb-ea06-46e0-8ec7-06739ccaec45",
+    "name": "PAC - 1st Floor - Free Weights",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Fitness Centre",
+      "PAC - 1st Floor - Free Weights"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": 75,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "b03ac6cb-b6ec-4fd4-bd21-e9872a3a43f3",
+    "name": "PAC - 1st Floor - Functional",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Fitness Centre",
+      "PAC - 1st Floor - Functional"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": 25,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "db0e08e1-faa7-4bc5-b639-088d7642a53e",
+    "name": "PAC - 2nd Floor - Cardio",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Fitness Centre",
+      "PAC - 2nd Floor - Cardio"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": 50,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "b08d4801-c28c-4eba-8602-8e904ae0568c",
+    "name": "PAC - 2nd Floor - Weight Machines",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Fitness Centre",
+      "PAC - 2nd Floor - Weight Machines"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": 40,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "37491bf2-2b69-429c-a754-4407d77da839",
+    "name": "PAC 1001",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Meeting Rooms",
+      "PAC 1001"
+    ],
+    "type": "Meeting Room",
+    "area": "360 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:30 PM",
+      "Monday": "7:00 AM - 11:30 PM",
+      "Tuesday": "7:00 AM - 11:30 PM",
+      "Wednesday": "7:00 AM - 11:30 PM",
+      "Thursday": "7:00 AM - 11:30 PM",
+      "Friday": "7:00 AM - 11:30 PM",
+      "Saturday": "9:00 AM - 11:30 PM"
+    }
+  },
+  {
+    "id": "58b4988f-fb79-42f9-bd19-f7dbb6c8eab7",
+    "name": "PAC Court 1 (International)",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Squash Courts",
+      "PAC Court 1 (International)"
+    ],
+    "type": "Squash Court",
+    "area": "672 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "5e568875-dadf-47bb-9080-ad4c4df145c1",
+    "name": "PAC Court 1 (North American)",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Squash Courts",
+      "PAC Court 1 (North American)"
+    ],
+    "type": "Squash Court",
+    "area": "672 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "b2eacfee-0fad-4fa1-a4bd-609bfe3ca532",
+    "name": "PAC Court 2 (International)",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Squash Courts",
+      "PAC Court 2 (International)"
+    ],
+    "type": "Squash Court",
+    "area": "672 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "f8162fb1-c828-431b-a6f8-c1bab9927b61",
+    "name": "PAC Court 2 (North American)",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Squash Courts",
+      "PAC Court 2 (North American)"
+    ],
+    "type": "Squash Court",
+    "area": "672 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "1f7c2dc8-ea2b-4c9d-b211-b46a78f2014d",
+    "name": "PAC Fitness Centre",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Fitness Centre"
+    ],
+    "type": "Fitness Centre",
+    "area": "4000 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "a3e9c00d-5aa7-45ea-ad73-f62c293856a8",
+    "name": "PAC Main Gym",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Main Gym"
+    ],
+    "type": "Gymnasium",
+    "area": "18800 Square feet",
+    "maxOccupancy": 100,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "5d72208a-069d-4931-aaa6-9527346efc6f",
+    "name": "PAC Pool",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Pool"
+    ],
+    "type": "Pool",
+    "area": "11520 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 - 12:30 AM",
+      "Tuesday": "6:00 - 12:30 AM",
+      "Wednesday": "6:00 - 12:30 AM",
+      "Thursday": "6:00 - 12:30 AM",
+      "Friday": "6:00 - 12:30 AM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "4c8a432d-409a-46eb-a1f5-a92bf3b609a2",
+    "name": "PAC Small Gym",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Small Gym"
+    ],
+    "type": "Gymnasium",
+    "area": "6879 Square feet",
+    "maxOccupancy": 32,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "163fb3bf-abf5-45b2-8340-ff22ae8b9ad1",
+    "name": "PAC Studio 1",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Studios",
+      "PAC Studio 1"
+    ],
+    "type": "Studio",
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "6:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "6:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "8790ee63-595f-40e9-9735-a325903b186c",
+    "name": "PAC Studio 2",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Studios",
+      "PAC Studio 2"
+    ],
+    "type": "Studio",
+    "area": "1716 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "bf76ecfc-d619-41bf-8e4b-f2158c1b6471",
+    "name": "PAC Studio 3",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Studios",
+      "PAC Studio 3"
+    ],
+    "type": "Studio",
+    "area": "1716 Square feet",
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "64284919-2dd7-4758-bb03-3d632071bd31",
+    "name": "PAC Village Green",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "PAC Village Green"
+    ],
+    "type": "Playing Field",
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "70dad426-928f-478d-b8c6-6e3784446de8",
+    "name": "Rock Climbing Wall",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Rock Climbing Wall"
+    ],
+    "type": null,
+    "area": null,
+    "maxOccupancy": 20,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "ce0c1830-d42e-49bf-81fb-41743d1c1386",
+    "name": "Spin Studio",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Spin Studio"
+    ],
+    "type": "Studio",
+    "area": null,
+    "maxOccupancy": null,
+    "liveOccupancy": false,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "f30dc951-26b0-4909-b814-ce54d38c2fbb",
+    "name": "Warrior Zone",
+    "building": "Physical Activities Complex",
+    "path": [
+      "Physical Activities Complex",
+      "Warrior Zone"
+    ],
+    "type": "Fitness Centre",
+    "area": "11237 Square feet",
+    "maxOccupancy": 60,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "9:00 AM - 11:59 PM",
+      "Monday": "6:00 AM - 11:59 PM",
+      "Tuesday": "6:00 AM - 11:59 PM",
+      "Wednesday": "6:00 AM - 11:59 PM",
+      "Thursday": "6:00 AM - 11:59 PM",
+      "Friday": "6:00 AM - 11:59 PM",
+      "Saturday": "9:00 AM - 11:59 PM"
+    }
+  }
+]

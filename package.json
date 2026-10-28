@@ -1,0 +1,13 @@
+{
+  "name": "warriorwatch",
+  "private": true,
+  "version": "0.0.0",
+  "description": "Live and historical occupancy for University of Waterloo athletics facilities (PAC, CIF).",
+  "workspaces": ["apps/*", "packages/*"],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "engines": { "node": ">=22" }
+}
