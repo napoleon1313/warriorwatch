@@ -2,7 +2,7 @@
 
 Two things to set up after the first deploy: an uptime monitor so you hear when scraping breaks, and an optional Discord alert when a gym gets quiet. Both only read the public API.
 
-Replace `https://<api-host>` with the real worker URL.
+Replace `https://warriorwatch-api.warriorwatch-worker.workers.dev` with the real worker URL.
 
 ## 1. Uptime monitor on `/api/health`
 
@@ -17,7 +17,7 @@ The worker can answer `200` while scraping is broken, so check the body for `"ok
 ### UptimeRobot (free plan, 5-minute checks)
 
 1. New monitor → type **Keyword**.
-2. URL: `https://<api-host>/api/health`
+2. URL: `https://warriorwatch-api.warriorwatch-worker.workers.dev/api/health`
 3. Keyword: `"ok":true`, alert when the keyword **does not exist**.
 4. Interval: 5 minutes.
 5. Alert contacts: the project email, and a Discord webhook if you want it in a channel (UptimeRobot has a Discord integration under Integrations).
@@ -38,7 +38,7 @@ What it catches:
 #!/usr/bin/env bash
 # ww-health.sh: run every 5 minutes. Posts to Discord when health turns bad, and again when it recovers.
 set -euo pipefail
-API="${API:-https://<api-host>/api}"
+API="${API:-https://warriorwatch-api.warriorwatch-worker.workers.dev/api}"
 WEBHOOK="${DISCORD_WEBHOOK:?set DISCORD_WEBHOOK}"
 STATE="${STATE:-$HOME/.ww-health-state}"
 
@@ -53,7 +53,7 @@ echo "$now" > "$STATE"
 ```
 
 ```
-*/5 * * * * API=https://<api-host>/api DISCORD_WEBHOOK=https://discord.com/api/webhooks/... /path/to/ww-health.sh
+*/5 * * * * API=https://warriorwatch-api.warriorwatch-worker.workers.dev/api DISCORD_WEBHOOK=https://discord.com/api/webhooks/... /path/to/ww-health.sh
 ```
 
 It only posts when the state flips, so a long outage is one message, not 288 a day.
@@ -74,7 +74,7 @@ Needs `curl` and `jq`.
 #!/usr/bin/env bash
 # ww-quiet.sh: run every 5 minutes. Alerts when a watched facility drops under 30%.
 set -euo pipefail
-API="${API:-https://<api-host>/api}"
+API="${API:-https://warriorwatch-api.warriorwatch-worker.workers.dev/api}"
 WEBHOOK="${DISCORD_WEBHOOK:?set DISCORD_WEBHOOK}"
 WATCH="${WATCH:-Free Weights|CIF Fitness}"      # regex on facility name
 STATE="${STATE:-$HOME/.ww-quiet-state}"          # ids already alerted
@@ -120,7 +120,7 @@ binding = "STATE"
 id = "<from: npx wrangler kv namespace create STATE>"
 
 [vars]
-API_BASE = "https://<api-host>/api"
+API_BASE = "https://warriorwatch-api.warriorwatch-worker.workers.dev/api"
 # DISCORD_WEBHOOK is a secret: npx wrangler secret put DISCORD_WEBHOOK
 ```
 

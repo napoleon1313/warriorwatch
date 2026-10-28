@@ -1,4 +1,4 @@
-name = "warriorwatch"
+name = "warriorwatch-api"
 main = "src/index.ts"
 compatibility_date = "2026-10-20"
 
@@ -9,9 +9,8 @@ crons = ["* * * * *", "15 9 * * *"]
 [[d1_databases]]
 binding = "DB"
 database_name = "warriorwatch"
-# Placeholder. Replace with the id printed by `wrangler d1 create warriorwatch` before the first remote deploy.
-# Local dev (`wrangler dev`, `--local` migrations) works with this value as is.
-database_id = "00000000-0000-0000-0000-000000000000"
+# Production database, created 2026-10-28 with `wrangler d1 create warriorwatch` (region ENAM).
+database_id = "ed515b4c-aa7e-4e7c-b144-cd32c96cb8b2"
 migrations_dir = "migrations"
 
 [observability]

@@ -3,13 +3,13 @@
 Free, read-only JSON for University of Waterloo gym occupancy. No key, no sign-up. CORS is open (`Access-Control-Allow-Origin: *`), so you can call it straight from a browser.
 
 ```
-https://<api-host>/api
+https://warriorwatch-api.warriorwatch-worker.workers.dev/api
 ```
 
 The production host isn't fixed yet. Every example below uses `$API`:
 
 ```bash
-export API="https://<api-host>/api"        # production
+export API="https://warriorwatch-api.warriorwatch-worker.workers.dev/api"        # production
 export API="http://localhost:8787/api"     # local worker (wrangler dev)
 ```
 
@@ -339,7 +339,7 @@ curl -s "$API/live" | jq -r '.facilities[] | select(.open and .label=="quiet") |
 In the browser:
 
 ```js
-const res = await fetch("https://<api-host>/api/live");
+const res = await fetch("https://warriorwatch-api.warriorwatch-worker.workers.dev/api/live");
 const { facilities } = await res.json();
 for (const f of facilities) console.log(`${f.name}: ${f.pct}% (${f.label})`);
 ```

@@ -24,7 +24,7 @@ function H2({ id, children }: { id: string; children: React.ReactNode }) {
 
 export default async function AboutPage() {
   const docs = await apiDocsHtml();
-  const base = USING_MOCK ? "https://<worker-host>" : API_BASE;
+  const base = USING_MOCK ? "https://warriorwatch-api.warriorwatch-worker.workers.dev" : API_BASE;
   return (
     <article className="max-w-2xl pb-4 text-[15px] leading-relaxed">
       <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">About WarriorWatch</h1>

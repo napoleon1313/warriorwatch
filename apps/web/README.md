@@ -49,8 +49,7 @@ Headers (`public/_headers`): `/embed/*` drops `X-Frame-Options` and allows any `
 | `API_BASE` | Pages runtime env (optional) | Overrides the above for the OG function only. |
 | `NEXT_PUBLIC_SITE_URL` | build | Absolute origin for OG/canonical URLs and embed snippets (default `https://warriorwatch.pages.dev`). |
 
-Cloudflare Pages project settings: root directory `apps/web`, build command `npm run build`, output `out`.
-`wrangler.toml` holds the same.
+Deployed 2026-10-28 to the Pages project `warriorwatch` at https://warriorwatch.pages.dev. `.env.production` holds the public API and site URLs, so `npm run deploy -w apps/web` builds against the live worker and uploads `out`. The OG function reads `API_BASE` from a Pages secret (`wrangler pages secret put API_BASE --project-name warriorwatch`).
 
 ## Demo data and switches (mock mode only)
 

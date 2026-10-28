@@ -2,8 +2,8 @@
 
 How busy the University of Waterloo gyms are right now, what they usually look like at this hour, and when to go today. Covers PAC (free weights, functional, cardio, machines), the CIF Fitness Centre, Warrior Zone and the Esports Lounge. Every number is also available as free JSON, so you can build your own thing on it.
 
-**Site:** `https://<site-host>` (link goes here at launch)
-**API:** `https://<api-host>/api` ([docs](docs/API.md))
+**Site:** https://warriorwatch.pages.dev
+**API:** `https://warriorwatch-api.warriorwatch-worker.workers.dev/api` ([docs](docs/API.md))
 
 Not affiliated with the University of Waterloo or Warriors Athletics.
 
@@ -31,7 +31,7 @@ WarriorWatch checks that page once a minute and keeps the history. With it you g
 ## API quickstart
 
 ```bash
-export API="https://<api-host>/api"
+export API="https://warriorwatch-api.warriorwatch-worker.workers.dev/api"
 ```
 
 Facilities take a slug (`pac-free-weights`, `pac-functional`, `pac-cardio`, `pac-machines`, `warrior-zone`, `cif-fitness`, `esports-lounge`) or the portal GUID. Times are UTC ISO strings; "today" and weekdays are Waterloo time.

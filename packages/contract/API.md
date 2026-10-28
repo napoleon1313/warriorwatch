@@ -1,6 +1,6 @@
 # WarriorWatch public API (v1)
 
-Base: `https://<worker-host>/api`. All JSON. `Access-Control-Allow-Origin: *`. Edge-cached; `Cache-Control` headers tell you how long.
+Base: `https://warriorwatch-api.warriorwatch-worker.workers.dev/api`. All JSON. `Access-Control-Allow-Origin: *`. Edge-cached; `Cache-Control` headers tell you how long.
 Facilities are addressed by **slug** (see `FACILITY_SLUGS`) or by the portal GUID.
 
 | Endpoint | Query | Returns | Cache |

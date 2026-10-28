@@ -85,7 +85,13 @@ npm run typecheck
 
 ## Deploy
 
-Not done yet. These are the steps when you're ready:
+Deployed 2026-10-28 as `warriorwatch-api` at https://warriorwatch-api.warriorwatch-worker.workers.dev with D1 `warriorwatch` (id in `wrangler.toml`). The crons have been running since. To redeploy after a change:
+
+```bash
+npm run deploy -w apps/worker
+```
+
+First-time setup, for reference:
 
 ```bash
 npx wrangler login
