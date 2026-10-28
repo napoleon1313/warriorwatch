@@ -1,8 +1,6 @@
 /** Hourly rebuild of the precomputed `typical` table from readings. */
-import type { Reading, TermBucket } from "@warriorwatch/contract";
-import { buildTypical, localSlot, termBucketFor, termCalendar } from "./analytics";
+import { buildTypical, termCalendar } from "@warriorwatch/analytics";
 import { readingsSince, upsertTypical } from "./db";
-import type { TypicalGroup } from "./db";
 import type { Env } from "./env";
 import { DAY } from "./time";
 
@@ -16,23 +14,7 @@ export const TYPICAL_LOOKBACK_DAYS = 70;
 export async function rebuildTypical(env: Env, facilityId: string, now: Date): Promise<number> {
   const since = new Date(now.getTime() - TYPICAL_LOOKBACK_DAYS * DAY).toISOString();
   const readings = await readingsSince(env.DB, facilityId, since);
-
-  const groups = new Map<string, { term: TermBucket; weekday: number; readings: Reading[] }>();
-  for (const r of readings) {
-    const term = termBucketFor(new Date(r.ts), termCalendar);
-    const { weekday } = localSlot(r.ts);
-    const key = `${term}:${weekday}`;
-    const g = groups.get(key) ?? { term, weekday, readings: [] };
-    g.readings.push(r);
-    groups.set(key, g);
-  }
-
-  const out: TypicalGroup[] = [...groups.values()].map((g) => ({
-    facilityId,
-    term: g.term,
-    weekday: g.weekday,
-    slots: buildTypical(g.readings, termCalendar),
-  }));
-  await upsertTypical(env.DB, out);
-  return out.length;
+  const groups = buildTypical(readings, termCalendar, { until: now });
+  await upsertTypical(env.DB, groups);
+  return groups.length;
 }

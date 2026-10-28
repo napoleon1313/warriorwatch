@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it } from "vitest";
 import { FACILITY_SLUGS, LIVE_FACILITY_ORDER, SOURCE } from "@warriorwatch/contract";
+import { APPOINTMENTS_URL } from "@warriorwatch/schedule";
 import type {
   BestResponse,
   EventsResponse,
@@ -14,6 +15,8 @@ import { app } from "../src/api";
 import type { HealthResponse } from "../src/api";
 import { resetSeedCheck } from "../src/db";
 import type { Deps, Env } from "../src/env";
+import { EVENTS_CYCLE_TICKS, eventsSlice, eventsWindow, runEventsTick } from "../src/events";
+import { SEED_FACILITIES } from "../src/db";
 import { refreshFacilities } from "../src/facilities";
 import { planReadings, runScrape } from "../src/ingest";
 import { handleScheduled } from "../src/scheduled";
@@ -23,6 +26,7 @@ import { FakeD1 } from "./d1-shim";
 const path = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 const OCCUPANCY_HTML = readFileSync(path("../../../fixtures/facility-occupancy-2026-10-27-2155.html"), "utf8");
 const FACILITY_HTML = readFileSync(path("../../../fixtures/get-facility-pac-free-weights.html"), "utf8");
+const MAIN_GYM_APPOINTMENTS = readFileSync(path("../../../fixtures/schedule-appointments-pac-main-gym-2026-11-01.json"), "utf8");
 const FREE_WEIGHTS = "7c59cbfb-ea06-46e0-8ec7-06739ccaec45";
 
 interface Call {
@@ -242,6 +246,83 @@ describe("API", () => {
     }
     expect(statuses.slice(0, 60).every((s) => s === 200)).toBe(true);
     expect(statuses[60]).toBe(429);
+  });
+});
+
+describe("facility calendar ingest", () => {
+  const json = (body: string, status = 200) => new Response(body, { status, headers: { "Content-Type": "application/json" } });
+  const NOW = "2026-11-01T16:00:00.000Z"; // Sunday 11:00 EST
+  const eventCount = (db: FakeD1) => (db.sqlite.prepare("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n;
+
+  it("covers all 44 facilities once per 15-tick cycle", () => {
+    expect(EVENTS_CYCLE_TICKS).toBe(15);
+    const all = Array.from({ length: EVENTS_CYCLE_TICKS }, (_, t) => eventsSlice(t)).flat();
+    expect(all).toEqual(SEED_FACILITIES.map((f) => f.id));
+    expect(eventsSlice(15)).toEqual(eventsSlice(0));
+  });
+
+  it("windows from the start of today in Toronto, 8 days long", () => {
+    const { from, to } = eventsWindow(new Date(NOW));
+    expect(from.toISOString()).toBe("2026-11-01T04:00:00.000Z"); // midnight EDT; DST ends at 2 AM that day
+    expect(to.getTime() - from.getTime()).toBe(8 * 86_400_000);
+  });
+
+  it("fetches 3 calendars 500 ms apart and stores expanded events", async () => {
+    const t = setup(() => json(MAIN_GYM_APPOINTMENTS), NOW);
+    const sleeps: number[] = [];
+    t.deps.sleep = async (ms) => void sleeps.push(ms);
+    const result = await runEventsTick(t.env, t.deps, 0);
+    expect(t.calls).toHaveLength(3);
+    expect(t.calls.every((c) => c.url.startsWith(APPOINTMENTS_URL) && c.ua === SOURCE.userAgent)).toBe(true);
+    expect(sleeps).toEqual([500, 500, 500]);
+    expect(result.failed).toEqual([]);
+    expect(result.updated.map((u) => u.facilityId)).toEqual(eventsSlice(0));
+    expect(result.updated[0]!.events).toBeGreaterThan(0);
+    expect(eventCount(t.db)).toBe(result.updated.reduce((a, u) => a + u.events, 0));
+
+    const { from, to } = eventsWindow(new Date(NOW));
+    const outside = t.db.sqlite.prepare('SELECT COUNT(*) AS n FROM events WHERE start >= ? OR "end" <= ?').get(to.toISOString(), from.toISOString());
+    expect(outside).toEqual({ n: 0 });
+  });
+
+  it("replaces the window, so cancelled events disappear, and keeps rows when the fetch fails", async () => {
+    let body = MAIN_GYM_APPOINTMENTS;
+    let status = 200;
+    const t = setup(() => json(body, status), NOW);
+    await runEventsTick(t.env, t.deps, 0);
+    const full = eventCount(t.db);
+
+    // Fetch fails: nothing deleted.
+    status = 503;
+    const failed = await runEventsTick(t.env, t.deps, 0);
+    expect(failed.failed).toHaveLength(3);
+    expect(eventCount(t.db)).toBe(full);
+
+    // The calendar shrinks: the window is replaced, not merged.
+    status = 200;
+    body = JSON.stringify((JSON.parse(MAIN_GYM_APPOINTMENTS) as unknown[]).slice(0, 1));
+    const shrunk = await runEventsTick(t.env, t.deps, 0);
+    expect(eventCount(t.db)).toBe(shrunk.updated.reduce((a, u) => a + u.events, 0));
+    expect(eventCount(t.db)).toBeLessThan(full);
+  });
+
+  it("serves stored events through /api/events", async () => {
+    const t = setup(() => json(MAIN_GYM_APPOINTMENTS), NOW);
+    await runEventsTick(t.env, t.deps, 0);
+    const id = eventsSlice(0)[0]!;
+    const res = await app.request(`/api/events?facility=${id}&from=2026-11-01T04:00:00Z&to=2026-11-09T05:00:00Z`, {}, t.env);
+    const body = (await res.json()) as EventsResponse;
+    expect(res.status).toBe(200);
+    expect(body.events.length).toBe(eventCount(t.db) / 3);
+    expect(body.events[0]).toMatchObject({ facilityId: id });
+    expect(body.events.every((e, i, a) => i === 0 || a[i - 1]!.start <= e.start)).toBe(true);
+  });
+
+  it("runs on the minute cron after the scrape, and a calendar failure does not lose the reading", async () => {
+    const t = setup((url) => (url === SOURCE.occupancyUrl ? html(OCCUPANCY_HTML) : json("not json", 500)), NOW);
+    await handleScheduled("* * * * *", Date.parse(NOW), t.env, t.deps);
+    expect(t.calls.map((c) => c.url.startsWith(APPOINTMENTS_URL))).toEqual([false, true, true, true]);
+    expect(t.db.sqlite.prepare("SELECT COUNT(*) AS n FROM readings").get()).toEqual({ n: 7 });
   });
 });
 

@@ -3,7 +3,7 @@
  * D1 counts queries per invocation, and the free plan allows 50.
  */
 import type { D1Database } from "@cloudflare/workers-types";
-import type { Facility, FacilityEvent, Reading, TypicalSlot, TermBucket } from "@warriorwatch/contract";
+import type { Facility, FacilityEvent, Reading, TermBucket, TypicalResponse, TypicalSlot } from "@warriorwatch/contract";
 import facilitiesJson from "@warriorwatch/contract/facilities.json";
 
 export interface ReadingRow {
@@ -210,14 +210,7 @@ export async function readingsSince(db: D1Database, facilityId: string, since: s
 
 // ---------- typical ----------
 
-export interface TypicalGroup {
-  facilityId: string;
-  term: TermBucket;
-  weekday: number;
-  slots: TypicalSlot[];
-}
-
-export async function upsertTypical(db: D1Database, groups: TypicalGroup[]): Promise<void> {
+export async function upsertTypical(db: D1Database, groups: TypicalResponse[]): Promise<void> {
   const rows = groups.flatMap((g) =>
     g.slots.map((s) => ({ f: g.facilityId, t: g.term, w: g.weekday, m: s.minute, md: s.median, lo: s.p25, hi: s.p75, n: s.n })),
   );

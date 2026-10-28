@@ -17,7 +17,19 @@ import type {
   TypicalResponse,
   TypicalSlot,
 } from "@warriorwatch/contract";
-import { bestWindows, confidence, isOpen, localSlot, termBucketFor, termCalendar, trend } from "./analytics";
+import {
+  bestWindows,
+  confidence,
+  isOpen,
+  localDateKey,
+  localParts,
+  localSlot,
+  termBucketFor,
+  termCalendar,
+  trend,
+  zonedTimeToUtc,
+} from "@warriorwatch/analytics";
+import type { Weekday } from "@warriorwatch/analytics";
 import {
   SEED_FACILITIES,
   daysOfData,
@@ -36,8 +48,7 @@ import {
 import type { ReadingRow } from "./db";
 import type { Env } from "./env";
 import { bucketize, sampleAt } from "./series";
-import { DAY, HOUR, MINUTE, isIsoDate, localParts, localToUtc } from "./time";
-import type { Weekday } from "./time";
+import { DAY, HOUR, MINUTE, isIsoDate } from "./time";
 
 export interface HealthResponse {
   ok: boolean;
@@ -300,12 +311,11 @@ app.get("/api/typical", cached(3600), async (c) => {
 app.get("/api/best", cached(900), async (c) => {
   const facilityId = resolveFacility(c.req.query("facility"), { liveOnly: true });
   const now = new Date();
-  const date = c.req.query("date") || localParts(now).date;
+  const date = c.req.query("date") || localDateKey(now);
   if (!isIsoDate(date)) throw new HttpError(400, "date must be YYYY-MM-DD");
 
-  const noon = localToUtc(date, 12 * 60);
-  const weekday = localParts(noon).weekday;
-  const term = termBucketFor(noon, termCalendar);
+  const weekday = localParts(zonedTimeToUtc(date, 12 * 60)).weekday;
+  const term = termBucketFor(date, termCalendar);
   await ensureSeeded(c.env.DB, now);
   const [facility, stored, days, latest] = await Promise.all([
     getFacility(c.env.DB, facilityId),
@@ -314,8 +324,7 @@ app.get("/api/best", cached(900), async (c) => {
     latestReadings(c.env.DB),
   ]);
   const max = facility?.maxOccupancy ?? latest.get(facilityId)?.max ?? 0;
-  const nowIso = now.toISOString();
-  const windows = bestWindows(fullDay(stored), facility?.hours ?? {}, date, max).filter((w) => w.end > nowIso);
+  const windows = bestWindows(fullDay(stored), facility?.hours ?? {}, date, max, { from: now });
   return c.json<BestResponse>({ facilityId, date, windows, confidence: confidence(days), daysOfData: days });
 });
 

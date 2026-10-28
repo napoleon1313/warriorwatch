@@ -3,8 +3,8 @@ import type { HistoryPoint } from "@warriorwatch/contract";
 import type { ReadingRow } from "./db";
 import { MINUTE } from "./time";
 
-/** A stored row stands for at most this long; heartbeats are hourly, so longer means a gap. */
-export const FILL_CAP_MS = 75 * MINUTE;
+/** A stored row stands for at most this long; heartbeats are hourly, so longer means a gap. Matches analytics' maxGapMinutes default. */
+export const FILL_CAP_MS = 90 * MINUTE;
 /** Scrapes run every minute, so the last good scrape vouches for the value a little past its own time. */
 const SCRAPE_SLACK_MS = 2 * MINUTE;
 

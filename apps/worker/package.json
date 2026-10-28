@@ -12,7 +12,9 @@
     "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.test.json"
   },
   "dependencies": {
+    "@warriorwatch/analytics": "*",
     "@warriorwatch/contract": "*",
+    "@warriorwatch/schedule": "*",
     "hono": "^4.13.14"
   },
   "devDependencies": {
