@@ -1,0 +1,34 @@
+{
+  "name": "@warriorwatch/analytics",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Pure analytics for WarriorWatch: term buckets, typical curves, best windows, trend, opening hours.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./src/index.ts",
+      "default": "./src/index.ts"
+    },
+    "./term-calendar.json": "./term-calendar.json"
+  },
+  "files": [
+    "src",
+    "term-calendar.json"
+  ],
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --coverage",
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "dependencies": {
+    "@warriorwatch/contract": "*"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@vitest/coverage-v8": "^5.0.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.5"
+  }
+}
