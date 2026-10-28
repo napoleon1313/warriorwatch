@@ -1,0 +1,9 @@
+# Cloudflare Pages project config (static export in ./out + Pages Functions in ./functions).
+name = "warriorwatch"
+pages_build_output_dir = "out"
+compatibility_date = "2026-10-01"
+
+# Set NEXT_PUBLIC_API_BASE in the Pages dashboard (it is read at build time by
+# Next and at runtime by the OG function). Unset = demo data.
+# [vars]
+# NEXT_PUBLIC_API_BASE = "https://warriorwatch-api.example.workers.dev"
