@@ -1,12 +1,15 @@
 /**
  * Facility calendar ingest, per the adapter note in packages/schedule/README.md:
  * 3 facilities per 1-minute tick, round-robin over facilities.json, so all 44 refresh every 15 minutes.
+ *
+ * D1 meters rows written, so a facility's window is rewritten only when the fetched bookings differ
+ * from what is stored. Most ticks read ~40 rows and write nothing.
  */
 import { localDateKey, localDayBounds } from "@warriorwatch/analytics";
 import type { FacilityEvent, FacilityId } from "@warriorwatch/contract";
 import { fetchFacilityEvents } from "@warriorwatch/schedule";
 import type { D1Database } from "@cloudflare/workers-types";
-import { SEED_FACILITIES } from "./db";
+import { SEED_FACILITIES, eventsBetween } from "./db";
 import type { Deps, Env } from "./env";
 import { DAY } from "./time";
 
@@ -28,16 +31,32 @@ export function eventsWindow(now: Date): { from: Date; to: Date } {
 }
 
 /**
- * Replace the facility's events overlapping [from, to) with `events`, in one batch, so rescheduled or
- * cancelled events do not linger. Rows before `from` stay as history.
+ * The stored form of a list of events: one row per (start, title), last one wins, order-independent.
+ * Mirrors the table's primary key and the insert's ON CONFLICT clause, so a fetched list and the
+ * rows it would produce canonicalise to the same string.
  */
-export async function replaceEventsWindow(db: D1Database, facilityId: FacilityId, from: Date, to: Date, events: FacilityEvent[]): Promise<void> {
-  const del = db
-    .prepare('DELETE FROM events WHERE facility_id = ?1 AND start < ?3 AND "end" > ?2')
-    .bind(facilityId, from.toISOString(), to.toISOString());
-  if (events.length === 0) {
+export function canonicalEvents(events: readonly FacilityEvent[]): string {
+  const rows = new Map<string, string>();
+  for (const e of events) rows.set(`${e.start}\t${e.title}`, `${e.start}\t${e.title}\t${e.end}\t${e.kind ?? ""}`);
+  return [...rows.values()].sort().join("\n");
+}
+
+/**
+ * Make the facility's stored events overlapping [from, to) equal `events`, so rescheduled or cancelled
+ * events do not linger. Rows before `from` stay as history. Returns whether anything was written:
+ * when the fetched list matches what is stored, the table is left untouched.
+ */
+export async function replaceEventsWindow(db: D1Database, facilityId: FacilityId, from: Date, to: Date, events: FacilityEvent[]): Promise<boolean> {
+  const fromIso = from.toISOString();
+  const toIso = to.toISOString();
+  const inWindow = events.filter((e) => e.start < toIso && e.end > fromIso);
+  const stored = await eventsBetween(db, facilityId, fromIso, toIso);
+  if (canonicalEvents(stored) === canonicalEvents(inWindow)) return false;
+
+  const del = db.prepare('DELETE FROM events WHERE facility_id = ?1 AND start < ?3 AND "end" > ?2').bind(facilityId, fromIso, toIso);
+  if (inWindow.length === 0) {
     await db.batch([del]);
-    return;
+    return true;
   }
   const ins = db
     .prepare(
@@ -47,12 +66,13 @@ export async function replaceEventsWindow(db: D1Database, facilityId: FacilityId
        FROM json_each(?1) WHERE true
        ON CONFLICT (facility_id, start, title) DO UPDATE SET "end" = excluded."end", kind = excluded.kind`,
     )
-    .bind(JSON.stringify(events));
+    .bind(JSON.stringify(inWindow));
   await db.batch([del, ins]);
+  return true;
 }
 
 export interface EventsTickResult {
-  updated: { facilityId: FacilityId; events: number }[];
+  updated: { facilityId: FacilityId; events: number; changed: boolean }[];
   failed: FacilityId[];
 }
 
@@ -71,8 +91,8 @@ export async function runEventsTick(env: Env, deps: Deps, tick: number): Promise
       console.warn(`schedule ${facilityId}: ${String(err)}`);
       continue;
     }
-    await replaceEventsWindow(env.DB, facilityId, from, to, events);
-    result.updated.push({ facilityId, events: events.length });
+    const changed = await replaceEventsWindow(env.DB, facilityId, from, to, events);
+    result.updated.push({ facilityId, events: events.length, changed });
   }
   return result;
 }

@@ -20,7 +20,8 @@ import { SEED_FACILITIES } from "../src/db";
 import { refreshFacilities } from "../src/facilities";
 import { planReadings, runScrape } from "../src/ingest";
 import { handleScheduled } from "../src/scheduled";
-import { rebuildTypical } from "../src/typical";
+import { changedSlots, datesToRebuild, rebuildTypical, sameWeekdayWindows } from "../src/typical";
+import { shiftDateKey } from "../src/time";
 import { FakeD1 } from "./d1-shim";
 
 const path = (p: string) => fileURLToPath(new URL(p, import.meta.url));
@@ -185,7 +186,7 @@ describe("API", () => {
     expect(fw).toMatchObject({ name: "PAC - 1st Floor - Free Weights", building: "Physical Activities Complex", count: 42, max: 75, pct: 56 });
     expect(fw.sparkline).toHaveLength(36);
     expect(fw.sparkline[35]).toBe(42);
-    expect(["closed", "busy"]).toContain(fw.label);
+    expect(["closed", "moderate"]).toContain(fw.label); // 42 of 75 is 56%: moderate when open
   });
 
   it("/api/facilities returns all 44", async () => {
@@ -306,6 +307,21 @@ describe("facility calendar ingest", () => {
     expect(eventCount(t.db)).toBeLessThan(full);
   });
 
+  it("leaves the table untouched when the fetched calendar matches what is stored", async () => {
+    const t = setup(() => json(MAIN_GYM_APPOINTMENTS), NOW);
+    const first = await runEventsTick(t.env, t.deps, 0);
+    expect(first.updated.map((u) => u.changed)).toEqual([true, true, true]);
+    const writes: string[] = [];
+    const batch = t.db.batch.bind(t.db);
+    t.db.batch = async (statements) => {
+      writes.push(...statements.map((s) => s.sql));
+      return batch(statements);
+    };
+    const again = await runEventsTick(t.env, t.deps, 0);
+    expect(again.updated.map((u) => u.changed)).toEqual([false, false, false]);
+    expect(writes).toEqual([]);
+  });
+
   it("serves stored events through /api/events", async () => {
     const t = setup(() => json(MAIN_GYM_APPOINTMENTS), NOW);
     await runEventsTick(t.env, t.deps, 0);
@@ -331,5 +347,57 @@ describe("migration", () => {
     expect(readFileSync(path("../migrations/0001_init.sql"), "utf8")).toBe(
       readFileSync(path("../../../packages/contract/schema.sql"), "utf8"),
     );
+  });
+});
+
+describe("typical rebuild writes only what moved", () => {
+  const day = (iso: string) => iso.slice(0, 10);
+
+  it("rebuilds today, and yesterday too only in the first hours after local midnight", () => {
+    // 2026-11-04 is a Wednesday; 03:30 UTC is 22:30 EST on the 3rd, 06:30 UTC is 01:30 on the 4th.
+    expect(datesToRebuild(new Date("2026-11-04T03:30:00Z"))).toEqual(["2026-11-03"]);
+    expect(datesToRebuild(new Date("2026-11-04T06:30:00Z"))).toEqual(["2026-11-04", "2026-11-03"]);
+    expect(datesToRebuild(new Date("2026-11-04T15:00:00Z"))).toEqual(["2026-11-04"]);
+    expect(shiftDateKey("2026-03-01", -1)).toBe("2026-02-28");
+  });
+
+  it("reads the same weekday across the lookback, each window padded back two hours", () => {
+    const windows = sameWeekdayWindows("2026-11-04");
+    expect(windows).toHaveLength(10);
+    expect(windows[0]).toEqual({ since: "2026-11-04T03:00:00.000Z", until: "2026-11-05T05:00:00.000Z" });
+    expect(day(windows[1]!.since)).toBe("2026-10-28");
+    expect(new Set(windows.map((w) => new Date(w.until).getUTCDay())).size).toBe(1);
+  });
+
+  it("diffs slots against stored rows", () => {
+    const slot = (minute: number, median: number | null, n: number) => ({ minute, median, p25: median, p75: median, n });
+    const group = { facilityId: FREE_WEIGHTS, term: "term" as const, weekday: 3 as const, slots: [slot(0, 1, 2), slot(15, 2, 2), slot(30, null, 0)] };
+    expect(changedSlots(group, [])).toHaveLength(3);
+    expect(changedSlots(group, [slot(0, 1, 2), slot(15, 2, 2), slot(30, null, 0)])).toEqual([]);
+    expect(changedSlots(group, [slot(0, 1, 2), slot(15, 2, 3), slot(30, null, 0)]).map((s) => s.minute)).toEqual([15]);
+  });
+
+  it("writes every slot once, then nothing, then only the slots a new reading touches", async () => {
+    const t = setup(() => html(OCCUPANCY_HTML));
+    const now = new Date();
+    const rows: string[] = [];
+    for (let d = 7; d <= 14; d += 7) {
+      for (let m = 0; m < 24 * 60; m += 30) {
+        const ts = new Date(now.getTime() - d * 86_400_000 + m * 60_000).toISOString();
+        rows.push(`('${FREE_WEIGHTS}', '${ts}', ${m < 12 * 60 ? 10 : 50}, 75)`);
+      }
+    }
+    t.db.sqlite.exec(`INSERT INTO readings (facility_id, ts, count, max) VALUES ${rows.join(",")}`);
+    const first = await rebuildTypical(t.env, FREE_WEIGHTS, now);
+    expect(first.written).toBeGreaterThanOrEqual(96);
+    const second = await rebuildTypical(t.env, FREE_WEIGHTS, now);
+    expect(second).toEqual({ groups: first.groups, written: 0 });
+
+    // One reading an hour ago today moves at most a handful of slots.
+    const ts = new Date(now.getTime() - 3_600_000).toISOString();
+    t.db.sqlite.exec(`INSERT INTO readings (facility_id, ts, count, max) VALUES ('${FREE_WEIGHTS}', '${ts}', 99, 75)`);
+    const third = await rebuildTypical(t.env, FREE_WEIGHTS, now);
+    expect(third.written).toBeGreaterThan(0);
+    expect(third.written).toBeLessThanOrEqual(8);
   });
 });

@@ -26,8 +26,8 @@ export async function handleScheduled(cron: string, scheduledTime: number, env: 
   const facilityId = LIVE_FACILITY_ORDER[minute - TYPICAL_FIRST_MINUTE];
   if (facilityId) {
     try {
-      const groups = await rebuildTypical(env, facilityId, deps.now());
-      console.log(`typical rebuilt for ${facilityId}: ${groups} groups`);
+      const { groups, written } = await rebuildTypical(env, facilityId, deps.now());
+      console.log(`typical ${facilityId}: ${groups} groups, ${written} slots written`);
     } catch (err) {
       console.error(`typical rebuild for ${facilityId} failed: ${String(err)}`);
     }
@@ -35,7 +35,7 @@ export async function handleScheduled(cron: string, scheduledTime: number, env: 
 
   try {
     const { updated, failed } = await runEventsTick(env, deps, Math.floor(scheduledTime / MINUTE));
-    console.log(`events: ${updated.map((u) => `${u.facilityId}=${u.events}`).join(" ")}${failed.length ? ` failed=${failed.join(",")}` : ""}`);
+    console.log(`events: ${updated.map((u) => `${u.facilityId}=${u.events}${u.changed ? "*" : ""}`).join(" ")}${failed.length ? ` failed=${failed.join(",")}` : ""}`);
   } catch (err) {
     console.error(`events tick failed: ${String(err)}`);
   }

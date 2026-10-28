@@ -208,6 +208,17 @@ export async function readingsSince(db: D1Database, facilityId: string, since: s
   return results.map((r) => ({ facilityId: r.facility_id, ts: r.ts, count: r.count, max: r.max }));
 }
 
+/** Readings in any of the UTC ranges [since, until), in time order. One query, however many ranges. */
+export async function readingsInRanges(db: D1Database, facilityId: string, ranges: readonly { since: string; until: string }[]): Promise<Reading[]> {
+  if (ranges.length === 0) return [];
+  const where = ranges.map(() => "(ts >= ? AND ts < ?)").join(" OR ");
+  const { results } = await db
+    .prepare(`SELECT facility_id, ts, count, max FROM readings WHERE facility_id = ? AND (${where}) ORDER BY ts`)
+    .bind(facilityId, ...ranges.flatMap((r) => [r.since, r.until]))
+    .all<ReadingRow>();
+  return results.map((r) => ({ facilityId: r.facility_id, ts: r.ts, count: r.count, max: r.max }));
+}
+
 // ---------- typical ----------
 
 export async function upsertTypical(db: D1Database, groups: TypicalResponse[]): Promise<void> {
