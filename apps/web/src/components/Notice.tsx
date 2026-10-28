@@ -8,7 +8,7 @@ const TONE = {
 
 export function Notice({ tone = "info", children, action }: { tone?: keyof typeof TONE; children: ReactNode; action?: ReactNode }) {
   return (
-    <div role={tone === "info" ? "status" : "alert"} className={`flex flex-wrap items-center justify-between gap-2 rounded-xl border px-4 py-3 text-sm ${TONE[tone]}`}>
+    <div role={tone === "info" ? "status" : "alert"} className={`flex flex-wrap items-center justify-between gap-2 rounded-md border px-4 py-3 text-sm ${TONE[tone]}`}>
       <div>{children}</div>
       {action}
     </div>
@@ -18,7 +18,7 @@ export function Notice({ tone = "info", children, action }: { tone?: keyof typeo
 /** For sections that have nothing honest to show yet. */
 export function EmptyState({ title, children }: { title: string; children?: ReactNode }) {
   return (
-    <div className="rounded-xl border border-dashed border-line px-4 py-6 text-center">
+    <div className="rounded-md border border-dashed border-line px-4 py-6 text-center">
       <p className="text-sm font-medium">{title}</p>
       {children && <p className="mx-auto mt-1 max-w-sm text-sm text-muted">{children}</p>}
     </div>

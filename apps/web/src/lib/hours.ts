@@ -1,11 +1,11 @@
 import type { FacilityHours } from "@warriorwatch/contract";
-import { WEEKDAYS, localParts, formatMinute, type Weekday } from "./time";
+import { WEEKDAYS, addDays, formatMinute, localParts, zonedToUtc, type Weekday } from "./time";
 
 /**
  * Presentation-side parser for the portal's hours strings. Every variant in
- * facilities.json is covered by hours.test.ts. When @warriorwatch/analytics
- * lands, `isOpen` there is the canonical implementation; this one only feeds
- * display text ("closes 11:59 PM", "opens 6 AM") and the mock.
+ * facilities.json is covered by hours.test.ts. @warriorwatch/analytics has the
+ * canonical `isOpen`; this one feeds display text ("closes 11:59 PM",
+ * "opens Wed 6 AM, in 3 h 20 min") and the mock.
  */
 export interface Range {
   /** minutes since local midnight */
@@ -63,23 +63,68 @@ export function formatRange(r: Range | null): string {
   return `${formatMinute(r.open)} – ${formatMinute(r.close)}`;
 }
 
-/** Short human status, e.g. "Closes at midnight" or "Opens 6 AM tomorrow". */
-export function openStatus(hours: FacilityHours, at: Date | number = Date.now()): { open: boolean; text: string } {
-  const lp = localParts(at);
-  const open = isOpenAt(hours, at);
+/** "in 3 h 20 min", "in 45 min", "in 2 days" */
+export function formatCountdown(ms: number): string {
+  const m = Math.max(0, Math.round(ms / 60_000));
+  if (m < 1) return "now";
+  if (m < 60) return `in ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return m % 60 ? `in ${h} h ${m % 60} min` : `in ${h} h`;
+  const d = Math.round(h / 24);
+  return `in ${d} day${d === 1 ? "" : "s"}`;
+}
+
+export interface OpenStatus {
+  open: boolean;
+  /** "Closes midnight" / "Opens 6 AM tomorrow" */
+  text: string;
+  /** instant of the next transition (close if open, open if closed); null if unknown */
+  at: number | null;
+  /** "in 3 h 20 min" relative to `now`; "" if unknown */
+  inText: string;
+  /** "Wed 6:00 AM" absolute, for the closed state */
+  whenText: string;
+}
+
+const SHORT = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+/**
+ * Open/closed with the next transition. When closed, gives the next opening
+ * as both an absolute time ("Wed 6 AM") and a countdown ("in 3 h 20 min").
+ */
+export function openStatus(hours: FacilityHours, at: Date | number = Date.now()): OpenStatus {
+  const nowMs = at instanceof Date ? at.getTime() : at;
+  const lp = localParts(nowMs);
+  const open = isOpenAt(hours, nowMs);
   if (open) {
     const today = rangeFor(hours, lp.weekday);
     const yday = rangeFor(hours, ((lp.weekday + 6) % 7) as Weekday);
-    const close =
-      today && lp.minuteOfDay >= today.open ? today.close : yday ? yday.close - 1440 : null;
-    return { open, text: close == null ? "Open" : `Closes ${formatMinute(close)}` };
+    const inToday = today && lp.minuteOfDay >= today.open;
+    const closeMin = inToday ? today.close : yday ? yday.close - 1440 : null;
+    if (closeMin == null) return { open, text: "Open", at: null, inText: "", whenText: "" };
+    const closeAt = zonedToUtc(inToday ? lp.ymd : lp.ymd, closeMin).getTime();
+    return {
+      open,
+      text: `Closes ${formatMinute(closeMin)}`,
+      at: closeAt,
+      inText: formatCountdown(closeAt - nowMs),
+      whenText: formatMinute(closeMin),
+    };
   }
-  for (let i = 0; i < 7; i++) {
+  for (let i = 0; i < 8; i++) {
     const wd = ((lp.weekday + i) % 7) as Weekday;
     const r = rangeFor(hours, wd);
     if (!r || (i === 0 && r.open <= lp.minuteOfDay)) continue;
+    const ymd = addDays(lp.ymd, i);
+    const openAt = zonedToUtc(ymd, r.open).getTime();
     const when = i === 0 ? "" : i === 1 ? " tomorrow" : ` ${WEEKDAYS[wd]}`;
-    return { open, text: `Opens ${formatMinute(r.open)}${when}` };
+    return {
+      open,
+      text: `Opens ${formatMinute(r.open)}${when}`,
+      at: openAt,
+      inText: formatCountdown(openAt - nowMs),
+      whenText: `${i === 0 ? "Today" : i === 1 ? "Tomorrow" : SHORT[wd]} ${formatMinute(r.open)}`,
+    };
   }
-  return { open, text: "Closed" };
+  return { open, text: "Closed", at: null, inText: "", whenText: "" };
 }

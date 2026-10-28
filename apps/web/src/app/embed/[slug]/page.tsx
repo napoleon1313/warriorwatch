@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { ClientOnly } from "@/components/ClientOnly";
 import { EmbedCard } from "@/components/EmbedCard";
 import { LIVE_SLUGS, SLUG_TO_ID, display } from "@/lib/facilities";
 
@@ -21,7 +22,9 @@ export default async function EmbedPage({ params }: { params: Params }) {
   if (!SLUG_TO_ID[slug]) notFound();
   return (
     <main className="p-0">
-      <EmbedCard slug={slug} />
+      <ClientOnly>
+        <EmbedCard slug={slug} />
+      </ClientOnly>
     </main>
   );
 }

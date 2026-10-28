@@ -1,15 +1,18 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo } from "react";
 import type { Facility, LiveFacility } from "@warriorwatch/contract";
 import { api, USING_MOCK } from "@/lib/api";
-import { BUILDING_LONG, buildingShort, display, slugOf } from "@/lib/facilities";
+import { BUILDING_LONG, buildingShort } from "@/lib/facilities";
 import { openStatus } from "@/lib/hours";
 import { usePolling, useNow } from "@/lib/hooks";
 import { formatTime, relativeAgo } from "@/lib/time";
 import { FacilityCard, FacilityCardSkeleton } from "./FacilityCard";
 import { Notice } from "./Notice";
+import { Overview } from "./Overview";
+import { RankBars } from "./RankBars";
+import { Section } from "./Section";
+import { WeekStrip } from "./WeekStrip";
 
 export const REFRESH_MS = 60_000;
 
@@ -33,34 +36,26 @@ export function LiveBoard() {
     return [...g.entries()];
   }, [live.data]);
 
-  const quietest = useMemo(() => {
-    const open = (live.data?.facilities ?? []).filter((f) => f.open && f.max >= 25);
-    return open.sort((a, b) => a.count / a.max - b.count / b.max)[0] ?? null;
-  }, [live.data]);
   const anyOpen = live.data?.facilities.some((f) => f.open) ?? false;
-
   const data = live.data;
+  let idx = 0;
+
   return (
-    <div className="space-y-6">
-      <div className="min-h-[3rem] text-sm text-muted" aria-live="polite">
+    <div className="space-y-5">
+      <div className="mono flex min-h-5 flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-muted" aria-live="polite">
         {data ? (
-          <p>
-            {anyOpen && quietest ? (
-              <>
-                Most room right now:{" "}
-                <Link href={`/f/${slugOf(quietest.id)}`} className="font-semibold text-fg underline decoration-line underline-offset-4 hover:decoration-current">
-                  {display(quietest.id).title}
-                </Link>{" "}
-                at {quietest.pct}% ({quietest.count}/{quietest.max}).
-              </>
-            ) : (
-              <>Everything is closed right now.</>
-            )}{" "}
-            <span className="tnum whitespace-nowrap">
-              Checked {formatTime(data.fetchedAt)} ({relativeAgo(data.fetchedAt, now)}).
+          <>
+            <span className="inline-flex items-center gap-2 text-fg">
+              <span className="live-dot" aria-hidden="true" />
+              {data.stale ? "STALE" : "LIVE"}
             </span>
-            {USING_MOCK && <span className="ml-1 rounded bg-line px-1.5 py-0.5 text-xs font-medium text-fg">Demo data</span>}
-          </p>
+            <span>
+              checked {formatTime(data.fetchedAt)} · {relativeAgo(data.fetchedAt, now)}
+            </span>
+            <span>refresh 60s</span>
+            {!anyOpen && <span className="text-fg">all rooms closed</span>}
+            {USING_MOCK && <span className="rounded border border-line px-1.5 py-0.5 text-fg">demo data</span>}
+          </>
         ) : live.error ? null : (
           <div className="skeleton h-4 w-64" aria-hidden="true" />
         )}
@@ -75,7 +70,7 @@ export function LiveBoard() {
         <Notice
           tone="error"
           action={
-            <button type="button" onClick={live.refresh} className="rounded-lg border border-current px-3 py-1 text-sm font-medium">
+            <button type="button" onClick={live.refresh} className="rounded-md border border-current px-3 py-1 text-sm font-medium">
               Try again
             </button>
           }
@@ -86,7 +81,11 @@ export function LiveBoard() {
 
       {!data && !live.error && (
         <section aria-busy="true" aria-label="Loading live counts">
-          <div className="skeleton mb-3 h-5 w-48" />
+          <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
+            {Array.from({ length: 4 }, (_, i) => (
+              <div key={i} className="skeleton h-[4.5rem]" />
+            ))}
+          </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {Array.from({ length: 6 }, (_, i) => (
               <FacilityCardSkeleton key={i} />
@@ -95,21 +94,40 @@ export function LiveBoard() {
         </section>
       )}
 
-      {groups.map(([building, list]) => (
-        <section key={building} aria-labelledby={`b-${building}`}>
-          <h2 id={`b-${building}`} className="mb-3 flex items-baseline gap-2 text-sm font-semibold uppercase tracking-wide text-muted">
-            {building}
-            <span className="font-normal normal-case tracking-normal">{BUILDING_LONG[building] ?? ""}</span>
-          </h2>
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {list.map((f) => {
-              const fac = hoursById.get(f.id);
-              const status = fac ? openStatus(fac.hours, now).text : undefined;
-              return <FacilityCard key={f.id} f={f} fetchedAt={data!.fetchedAt} now={now} status={status} />;
-            })}
-          </div>
-        </section>
-      ))}
+      {data && (
+        <>
+          <Overview facilities={data.facilities} hoursById={hoursById} now={now} />
+
+          {anyOpen && (
+            <Section eyebrow="rank" title="Right now, most room first" aside="share of posted capacity">
+              <RankBars facilities={data.facilities} />
+            </Section>
+          )}
+
+          {groups.map(([building, list]) => (
+            <section key={building} aria-labelledby={`b-${building}`}>
+              <h2 id={`b-${building}`} className="mb-2.5 flex items-baseline gap-2">
+                <span className="eyebrow text-fg">{building}</span>
+                <span className="text-xs text-muted">{BUILDING_LONG[building] ?? ""}</span>
+                <span className="mono ml-auto text-[11px] text-faint">
+                  {list.filter((f) => f.open).length}/{list.length} open
+                </span>
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {list.map((f) => {
+                  const fac = hoursById.get(f.id);
+                  const status = fac ? openStatus(fac.hours, now) : null;
+                  return <FacilityCard key={f.id} f={f} fetchedAt={data.fetchedAt} now={now} status={status} index={idx++} />;
+                })}
+              </div>
+            </section>
+          ))}
+
+          <Section eyebrow="shape" title="How today usually goes, room by room" aside="usual curve for this weekday · now marked">
+            <WeekStrip facilities={data.facilities} hoursById={hoursById} now={now} />
+          </Section>
+        </>
+      )}
     </div>
   );
 }

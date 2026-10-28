@@ -57,7 +57,7 @@ export function InstallHint() {
     } catch {}
   };
   return (
-    <div role="dialog" aria-label="Install WarriorWatch" className="fixed inset-x-3 bottom-3 z-30 mx-auto max-w-md rounded-2xl border border-line bg-card p-4 shadow-lg">
+    <div role="dialog" aria-label="Install WarriorWatch" className="fixed inset-x-3 bottom-3 z-30 mx-auto max-w-md panel p-4 shadow-lg">
       <p className="text-sm font-semibold">Check the gym in one tap</p>
       <p className="mt-1 text-sm text-muted">
         {ios ? (
@@ -80,7 +80,7 @@ export function InstallHint() {
               await evt.userChoice;
               dismiss();
             }}
-            className="rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-white dark:text-zinc-950"
+            className="rounded-md bg-accent px-3 py-2 text-sm font-semibold text-accent-ink"
           >
             Install
           </button>

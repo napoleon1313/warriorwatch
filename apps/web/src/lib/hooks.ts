@@ -95,3 +95,38 @@ export function useWidth<T extends HTMLElement>(fallback = 340): [RefObject<T | 
   }, []);
   return [ref, w];
 }
+
+export function prefersReducedMotion(): boolean {
+  return typeof matchMedia !== "undefined" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
+
+/**
+ * Integer that eases from its previous value to `value` over `ms`. First
+ * render shows the value at once (no count-up from zero on page load; that
+ * reads as fake). Respects reduced motion.
+ */
+export function useCountUp(value: number, ms = 600): number {
+  const [shown, setShown] = useState(value);
+  const from = useRef(value);
+  const raf = useRef(0);
+  useEffect(() => {
+    if (prefersReducedMotion() || from.current === value) {
+      from.current = value;
+      setShown(value);
+      return;
+    }
+    const start = performance.now();
+    const a = from.current;
+    const b = value;
+    const step = (t: number) => {
+      const p = Math.min(1, (t - start) / ms);
+      const e = 1 - Math.pow(1 - p, 3);
+      setShown(Math.round(a + (b - a) * e));
+      if (p < 1) raf.current = requestAnimationFrame(step);
+      else from.current = b;
+    };
+    raf.current = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf.current);
+  }, [value, ms]);
+  return shown;
+}

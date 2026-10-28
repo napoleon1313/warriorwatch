@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import facilities from "@warriorwatch/contract/facilities.json";
 import type { Facility } from "@warriorwatch/contract";
-import { isOpenAt, openStatus, parseRange } from "./hours";
+import { formatCountdown, isOpenAt, openStatus, parseRange } from "./hours";
 import { zonedToUtc } from "./time";
 
 describe("parseRange", () => {
@@ -29,8 +29,24 @@ describe("isOpenAt", () => {
   });
   it("reports the next opening", () => {
     const esports = { Monday: "12:00 - 10:00 PM", Tuesday: "12:00 - 10:00 PM" };
-    expect(openStatus(esports, zonedToUtc("2026-10-26", 9 * 60))).toEqual({ open: false, text: "Opens 12 PM" });
-    expect(openStatus(esports, zonedToUtc("2026-10-26", 23 * 60)).text).toBe("Opens 12 PM tomorrow");
-    expect(openStatus(esports, zonedToUtc("2026-10-26", 13 * 60)).text).toBe("Closes 10 PM");
+    const st = openStatus(esports, zonedToUtc("2026-10-26", 9 * 60));
+    expect(st).toMatchObject({ open: false, text: "Opens 12 PM", inText: "in 3 h", whenText: "Today 12 PM" });
+    expect(st.at).toBe(zonedToUtc("2026-10-26", 12 * 60).getTime());
+    const tm = openStatus(esports, zonedToUtc("2026-10-26", 23 * 60));
+    expect(tm.text).toBe("Opens 12 PM tomorrow");
+    expect(tm.whenText).toBe("Tomorrow 12 PM");
+    expect(tm.inText).toBe("in 13 h");
+    const op = openStatus(esports, zonedToUtc("2026-10-26", 13 * 60));
+    expect(op.text).toBe("Closes 10 PM");
+    expect(op.inText).toBe("in 9 h");
+  });
+});
+
+describe("formatCountdown", () => {
+  it("reads naturally", () => {
+    expect(formatCountdown(20_000)).toBe("now");
+    expect(formatCountdown(45 * 60_000)).toBe("in 45 min");
+    expect(formatCountdown((3 * 60 + 20) * 60_000)).toBe("in 3 h 20 min");
+    expect(formatCountdown(26 * 3_600_000)).toBe("in 1 day");
   });
 });

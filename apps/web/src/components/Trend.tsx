@@ -6,9 +6,9 @@ export const TREND_STEADY = 1;
 
 export function trendWord(trend: number | null): { arrow: string; text: string } | null {
   if (trend == null) return null;
-  if (trend >= TREND_STEADY) return { arrow: "↗", text: "Filling up" };
-  if (trend <= -TREND_STEADY) return { arrow: "↘", text: "Emptying" };
-  return { arrow: "→", text: "Steady" };
+  if (trend >= TREND_STEADY) return { arrow: "↗", text: "filling" };
+  if (trend <= -TREND_STEADY) return { arrow: "↘", text: "emptying" };
+  return { arrow: "→", text: "steady" };
 }
 
 export function Trend({ trend }: { trend: number | null }) {
@@ -16,8 +16,8 @@ export function Trend({ trend }: { trend: number | null }) {
   if (!t) return null;
   const per = trend == null ? "" : `${trend > 0 ? "+" : ""}${trend.toFixed(1)} people per 10 min over the last 20 min`;
   return (
-    <span className="inline-flex items-center gap-1 text-xs text-muted" title={per}>
-      <span aria-hidden="true" className="text-sm leading-none">
+    <span className="mono inline-flex items-center gap-1 text-[11px] text-muted" title={per}>
+      <span aria-hidden="true" className="text-xs leading-none">
         {t.arrow}
       </span>
       {t.text}

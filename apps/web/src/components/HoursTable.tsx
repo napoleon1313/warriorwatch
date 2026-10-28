@@ -15,7 +15,7 @@ export function HoursTable({ hours, today }: { hours: FacilityHours; today: Week
               {WEEKDAYS[d]}
               {d === today && <span className="sr-only"> (today)</span>}
             </th>
-            <td className="tnum py-1 text-right">{formatRange(rangeFor(hours, d))}</td>
+            <td className="mono py-1 text-right text-xs">{formatRange(rangeFor(hours, d))}</td>
           </tr>
         ))}
       </tbody>

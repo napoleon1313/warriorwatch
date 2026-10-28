@@ -42,7 +42,7 @@ export function ThemeToggle() {
         } catch {}
         apply(next);
       }}
-      className="grid h-11 w-11 place-items-center rounded-full text-lg text-muted hover:bg-line hover:text-fg"
+      className="ml-1 grid h-9 w-9 place-items-center rounded-md text-base text-muted hover:bg-line hover:text-fg"
       aria-label={`Theme: ${mode}. Switch to ${next}`}
       title={`Theme: ${mode}`}
     >

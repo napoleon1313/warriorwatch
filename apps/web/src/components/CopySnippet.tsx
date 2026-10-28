@@ -6,7 +6,7 @@ export function CopySnippet({ code, label }: { code: string; label: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <div className="relative">
-      <pre className="overflow-x-auto rounded-lg bg-[color:var(--bg)] p-3 pr-20 text-xs leading-relaxed" aria-label={label}>
+      <pre className="mono overflow-x-auto rounded-md border border-line bg-[color:var(--bg)] p-3 pr-20 text-xs leading-relaxed" aria-label={label}>
         <code>{code}</code>
       </pre>
       <button

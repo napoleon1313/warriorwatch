@@ -27,18 +27,18 @@ export function BestWindows({ best, now, isToday }: { best: BestResponse; now: n
   }
   return (
     <div>
-      <ol className="divide-y divide-line overflow-hidden rounded-xl border border-line">
+      <ol className="divide-y divide-line overflow-hidden rounded-md border border-line">
         {windows.map((w, i) => {
           const live = isToday && Date.parse(w.start) <= now && Date.parse(w.end) > now;
           return (
             <li key={w.start} className="flex items-center gap-3 bg-card px-3 py-2.5">
-              <span className="tnum w-5 text-center text-sm font-semibold text-muted">{i + 1}</span>
+              <span className="mono w-6 text-center text-[11px] text-faint">{String(i + 1).padStart(2, "0")}</span>
               <div className="min-w-0 flex-1">
-                <p className="tnum text-sm font-semibold">
+                <p className="mono text-sm font-semibold">
                   {formatTime(w.start)} – {formatTime(w.end)}
-                  {live && <span className="ml-2 rounded bg-accent px-1.5 py-0.5 text-[11px] font-bold text-white dark:text-zinc-950">NOW</span>}
+                  {live && <span className="ml-2 rounded border border-accent px-1.5 py-0.5 text-[10px] font-semibold text-accent">NOW</span>}
                 </p>
-                <p className="tnum text-xs text-muted">
+                <p className="mono text-[11px] text-muted">
                   Usually about {w.expected} {w.expected === 1 ? "person" : "people"} ({w.pct}%)
                 </p>
               </div>
@@ -47,7 +47,7 @@ export function BestWindows({ best, now, isToday }: { best: BestResponse; now: n
           );
         })}
       </ol>
-      <p className="mt-2 text-xs text-muted">{basis}. Expected counts, not a promise.</p>
+      <p className="mono mt-2 text-[11px] text-muted">{basis.toLowerCase()} · expected counts, not a promise</p>
     </div>
   );
 }

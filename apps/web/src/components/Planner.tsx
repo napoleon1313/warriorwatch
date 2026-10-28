@@ -52,14 +52,14 @@ export function Planner() {
     <div className="space-y-4">
       <form className="space-y-4" onSubmit={(e) => e.preventDefault()} aria-label="Pick a facility and day">
         <div>
-          <label htmlFor="facility" className="mb-1.5 block text-sm font-medium">
-            Where
+          <label htmlFor="facility" className="eyebrow mb-1.5 block">
+            where
           </label>
           <select
             id="facility"
             value={slug}
             onChange={(e) => setSlug(e.target.value)}
-            className="h-11 w-full rounded-xl border border-line bg-card px-3 text-base sm:max-w-sm"
+            className="h-11 w-full rounded-md border border-line bg-card px-3 text-base sm:max-w-sm"
           >
             {LIVE_SLUGS.map((s) => {
               const d = display(SLUG_TO_ID[s]!);
@@ -72,7 +72,7 @@ export function Planner() {
           </select>
         </div>
         <fieldset className="min-w-0">
-          <legend className="mb-1.5 text-sm font-medium">When</legend>
+          <legend className="eyebrow mb-1.5">when</legend>
           <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:px-0">
             {days.map((d, i) => {
               const checked = d === day;
@@ -81,13 +81,13 @@ export function Planner() {
               return (
                 <label
                   key={d}
-                  className={`relative flex min-w-[4.5rem] shrink-0 cursor-pointer flex-col items-center rounded-xl border px-3 py-2 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[color:var(--accent)] ${
-                    checked ? "border-accent bg-accent text-white dark:text-zinc-950" : "border-line bg-card hover:border-[color:var(--muted)]"
+                  className={`mono relative flex min-w-[4.5rem] shrink-0 cursor-pointer flex-col items-center rounded-md border px-3 py-2 text-xs has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[color:var(--accent)] ${
+                    checked ? "border-accent bg-accent-soft text-fg" : "border-line bg-card text-muted hover:text-fg"
                   }`}
                 >
                   <input type="radio" name="day" value={d} checked={checked} onChange={() => setDay(d)} className="sr-only" />
                   <span className="font-semibold">{i === 0 ? "Today" : i === 1 ? "Tmrw" : WEEKDAYS[wd].slice(0, 3)}</span>
-                  <span className={`text-xs ${checked ? "" : "text-muted"}`}>{closed ? "Closed" : formatYmd(d).split(", ")[1]}</span>
+                  <span className="text-[10px] opacity-80">{closed ? "Closed" : formatYmd(d).split(", ")[1]}</span>
                 </label>
               );
             })}
@@ -96,6 +96,7 @@ export function Planner() {
       </form>
 
       <Section
+        eyebrow="02"
         title={`Quietest times ${dayLabel}`}
         aside={n > 0 ? `Usual ${WEEKDAYS[weekday]} = ${plural(n, WEEKDAYS[weekday])} of data` : "\u00a0"}
       >
@@ -110,7 +111,7 @@ export function Planner() {
         </div>
       </Section>
 
-      <Section title={`A usual ${WEEKDAYS[weekday]}`}>
+      <Section eyebrow="03" title={`A usual ${WEEKDAYS[weekday]}`}>
         {typical.data && fac ? (
           n > 0 ? (
             <DayCurve

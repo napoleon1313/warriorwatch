@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { ClientOnly } from "@/components/ClientOnly";
 import { notFound } from "next/navigation";
 import { FacilityDetail } from "@/components/FacilityDetail";
 import { LIVE_SLUGS, SLUG_TO_ID, display } from "@/lib/facilities";
@@ -27,5 +28,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function FacilityPage({ params }: { params: Params }) {
   const { slug } = await params;
   if (!SLUG_TO_ID[slug]) notFound();
-  return <FacilityDetail slug={slug} />;
+  return (
+    <ClientOnly fallback={<div className="skeleton h-64 w-full" aria-hidden="true" />}>
+      <FacilityDetail slug={slug} />
+    </ClientOnly>
+  );
 }
