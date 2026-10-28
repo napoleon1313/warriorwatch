@@ -1,0 +1,21 @@
+{
+  "_note": "What the live DevExtreme 24.2.3 scheduler rendered for PAC Main Gym, week view 2026-11-01..07 (DST ends 2026-11-01), browser in America/Toronto, captured 2026-10-28 from .dx-scheduler-appointment innerText. Ground truth for packages/schedule expansion tests.",
+  "facilityId": "a3e9c00d-5aa7-45ea-ad73-f62c293856a8",
+  "rows": [
+    "Mon 2 | Building Closed 12:30 AM - 6:00 AM", "Tue 3 | Building Closed 12:30 AM - 6:00 AM", "Wed 4 | Building Closed 12:30 AM - 6:00 AM", "Thu 5 | Building Closed 12:30 AM - 6:00 AM", "Fri 6 | Building Closed 12:30 AM - 6:00 AM", "Sun 1 | Building Closed 12:30 AM - 9:00 AM", "Sat 7 | Building Closed 12:30 AM - 9:00 AM",
+    "Mon 2 | Fall 2026 - IU Women's Volleyball - IU Women's Volleyball 4:30 PM - 7:00 PM", "Mon 2 | Fall 2026 - IU Men's Volleyball - IU Men's Volleyball 7:00 PM - 9:00 PM",
+    "Tue 3 | Fall 2026 - IU Men's Basketball - IU Men's Basketball 7:00 AM - 9:00 AM", "Wed 4 | Fall 2026 - IU Men's Basketball - IU Men's Basketball 7:00 AM - 9:00 AM", "Thu 5 | Fall 2026 - IU Men's Basketball - IU Men's Basketball 7:00 AM - 9:00 AM",
+    "Tue 3 | Fall 2026 - IU Men's Basketball - IU Men's Basketball 4:00 PM - 6:00 PM", "Thu 5 | Fall 2026 - IU Men's Basketball - IU Men's Basketball 4:00 PM - 6:00 PM",
+    "Tue 3 | Fall 2026 - IU Women's Basketball - IU Women's Basketball 6:00 PM - 8:00 PM", "Thu 5 | Fall 2026 - IU Women's Basketball - IU Women's Basketball 6:00 PM - 8:00 PM",
+    "Wed 4 | Fall 2026 - IU Women's Volleyball - IU Women's Volleyball 4:00 PM - 6:00 PM", "Wed 4 | Fall 2026 - IU Men's Volleyball - IU Men's Volleyball 6:00 PM - 8:30 PM",
+    "Sun 1 | Fall 2026 - Open Rec Basketball - Open Rec Basketball 9:00 AM - 2:00 PM",
+    "Mon 2 | Fall 2026 - IU Men's Basketball - IU Men's Basketball 6:00 AM - 8:00 AM", "Mon 2 | Fall 2026 - Open Rec Basketball - Open Rec Basketball 8:30 AM - 4:00 PM",
+    "Tue 3 | Fall 2026 - IU Women's Basketball - IU Women's Basketball 7:00 AM - 9:00 AM", "Tue 3 | Fall 2026 - Open Rec Basketball - Open Rec Basketball 9:30 AM - 3:30 PM",
+    "Wed 4 | Fall 2026 - Open Rec Basketball - Open Rec Basketball 9:30 AM - 3:30 PM", "Thu 5 | Fall 2026 - Open Rec Basketball - Open Rec Basketball 9:30 AM - 3:30 PM",
+    "Fri 6 | Fall 2026 - Spirit Squad - Spirit Squad 7:00 AM - 8:30 AM", "Fri 6 | HOLD - Shoot Times for Carleton 9:00 AM - 11:00 AM",
+    "Fri 6 | Fall 2026 - IU Women's Basketball - IU Women's Basketball 11:00 AM - 12:00 PM", "Fri 6 | Fall 2026 - IU Men's Basketball - IU Men's Basketball 12:00 PM - 1:00 PM",
+    "Fri 6 | Fall 2026 - Open Rec Basketball - Open Rec Basketball 1:30 PM - 2:30 PM", "Fri 6 | Game Day Set Up 2:30 PM - 6:00 PM", "Fri 6 | vs Carleton 6:00 PM - 8:00 PM", "Fri 6 | vs Carleton 8:00 PM - 10:00 PM", "Fri 6 | Game Day Tear Down 10:00 PM - 12:00 AM",
+    "Sat 7 | Fall 2026 - Open Rec Basketball - Open Rec Basketball 9:00 AM - 10:30 AM", "Sat 7 | Fall 2026 - IU Women's Basketball - IU Women's Basketball 11:00 AM - 12:00 PM", "Sat 7 | Fall 2026 - Open Rec Basketball - Open Rec Basketball 12:30 PM - 2:30 PM",
+    "Sat 7 | Game Day Set Up 2:30 PM - 6:00 PM", "Sat 7 | vs Guelph 6:00 PM - 8:00 PM", "Sat 7 | vs Guelph 8:00 PM - 10:00 PM", "Sat 7 | Game Day Tear Down 10:00 PM - 12:00 AM"
+  ]
+}
