@@ -1,0 +1,18 @@
+name = "warriorwatch"
+main = "src/index.ts"
+compatibility_date = "2026-10-20"
+
+[triggers]
+# Every minute: scrape /FacilityOccupancy. Daily at 09:15 UTC (~5 AM Toronto): refresh the 44 facility pages.
+crons = ["* * * * *", "15 9 * * *"]
+
+[[d1_databases]]
+binding = "DB"
+database_name = "warriorwatch"
+# Placeholder. Replace with the id printed by `wrangler d1 create warriorwatch` before the first remote deploy.
+# Local dev (`wrangler dev`, `--local` migrations) works with this value as is.
+database_id = "00000000-0000-0000-0000-000000000000"
+migrations_dir = "migrations"
+
+[observability]
+enabled = true
