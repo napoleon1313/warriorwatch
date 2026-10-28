@@ -1,0 +1,50 @@
+{
+  "source": [
+    "https://uwaterloo.ca/registrar/important-dates",
+    "https://uwaterloo.ca/important-dates/undergraduate?dates=Any",
+    "https://uwaterloo.ca/important-dates/undergraduate/archive/2025-2026"
+  ],
+  "retrieved": "2026-10-28",
+  "notes": "Undergraduate dates. A term runs from 'Classes begin' to the last final-examination emergency day. 'exams' spans the pre-examination study days through the last emergency day. Statutory holidays and the University holiday closure are 'holiday'. Reading Week contains Thanksgiving/Family Day, which stay 'holiday'.",
+  "terms": [
+    { "name": "Fall 2025", "from": "2025-09-03", "to": "2025-12-19" },
+    { "name": "Winter 2026", "from": "2026-01-05", "to": "2026-04-24" },
+    { "name": "Spring 2026", "from": "2026-05-11", "to": "2026-08-20" },
+    { "name": "Fall 2026", "from": "2026-09-09", "to": "2026-12-23" },
+    { "name": "Winter 2027", "from": "2027-01-11", "to": "2027-04-30" },
+    { "name": "Spring 2027", "from": "2027-05-10", "to": "2027-08-21" }
+  ],
+  "ranges": [
+    { "from": "2025-09-01", "to": "2025-09-01", "bucket": "holiday", "label": "Labour Day" },
+    { "from": "2025-10-11", "to": "2025-10-19", "bucket": "reading-week", "label": "Fall 2025 Reading Week" },
+    { "from": "2025-10-13", "to": "2025-10-13", "bucket": "holiday", "label": "Thanksgiving Day" },
+    { "from": "2025-12-03", "to": "2025-12-19", "bucket": "exams", "label": "Fall 2025 study days and Final Examination Period" },
+    { "from": "2025-12-24", "to": "2026-01-02", "bucket": "holiday", "label": "University holiday closure" },
+
+    { "from": "2026-02-14", "to": "2026-02-22", "bucket": "reading-week", "label": "Winter 2026 Reading Week" },
+    { "from": "2026-02-16", "to": "2026-02-16", "bucket": "holiday", "label": "Family Day" },
+    { "from": "2026-04-03", "to": "2026-04-03", "bucket": "holiday", "label": "Good Friday" },
+    { "from": "2026-04-07", "to": "2026-04-24", "bucket": "exams", "label": "Winter 2026 study days and Final Examination Period" },
+
+    { "from": "2026-05-18", "to": "2026-05-18", "bucket": "holiday", "label": "Victoria Day" },
+    { "from": "2026-07-01", "to": "2026-07-01", "bucket": "holiday", "label": "Canada Day" },
+    { "from": "2026-08-03", "to": "2026-08-03", "bucket": "holiday", "label": "Civic Holiday" },
+    { "from": "2026-08-06", "to": "2026-08-20", "bucket": "exams", "label": "Spring 2026 study day and Final Examination Period" },
+
+    { "from": "2026-09-07", "to": "2026-09-07", "bucket": "holiday", "label": "Labour Day" },
+    { "from": "2026-10-10", "to": "2026-10-18", "bucket": "reading-week", "label": "Fall 2026 Reading Week" },
+    { "from": "2026-10-12", "to": "2026-10-12", "bucket": "holiday", "label": "Thanksgiving Day" },
+    { "from": "2026-12-09", "to": "2026-12-23", "bucket": "exams", "label": "Fall 2026 study day and Final Examination Period" },
+    { "from": "2026-12-24", "to": "2027-01-03", "bucket": "holiday", "label": "University holiday closure" },
+
+    { "from": "2027-02-13", "to": "2027-02-21", "bucket": "reading-week", "label": "Winter 2027 Reading Week" },
+    { "from": "2027-02-15", "to": "2027-02-15", "bucket": "holiday", "label": "Family Day" },
+    { "from": "2027-03-26", "to": "2027-03-26", "bucket": "holiday", "label": "Good Friday" },
+    { "from": "2027-04-13", "to": "2027-04-30", "bucket": "exams", "label": "Winter 2027 study days and Final Examination Period" },
+
+    { "from": "2027-05-24", "to": "2027-05-24", "bucket": "holiday", "label": "Victoria Day" },
+    { "from": "2027-07-01", "to": "2027-07-02", "bucket": "holiday", "label": "Canada Day and additional day" },
+    { "from": "2027-08-02", "to": "2027-08-02", "bucket": "holiday", "label": "Civic Holiday" },
+    { "from": "2027-08-06", "to": "2027-08-21", "bucket": "exams", "label": "Spring 2027 study day and Final Examination Period" }
+  ]
+}
