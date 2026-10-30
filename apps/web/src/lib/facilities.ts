@@ -57,9 +57,9 @@ const DISPLAY: Record<string, { title: string; where: string }> = {
   "cif-fitness": { title: "Fitness Centre", where: "CIF" },
   "esports-lounge": { title: "Esports Lounge", where: "PAC 2021 · PCs" },
   // Libraries (Waitz sensors). Totals are whole buildings; zones are floors or areas.
-  "dana-porter": { title: "Dana Porter", where: "Library · whole building" },
-  "davis-library": { title: "Davis Centre", where: "Library · whole building" },
-  musagetes: { title: "Musagetes", where: "Architecture library" },
+  "dana-porter": { title: "Dana Porter", where: "Library" },
+  "davis-library": { title: "Davis Centre", where: "Library" },
+  musagetes: { title: "Musagetes", where: "Library · Cambridge" },
   "dp-lower": { title: "Lower floor", where: "Dana Porter" },
   "dp-main": { title: "Main floor", where: "Dana Porter" },
   "dp-atc": { title: "Adaptive Tech Centre", where: "Dana Porter · main" },
