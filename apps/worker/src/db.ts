@@ -3,7 +3,7 @@
  * D1 counts queries per invocation, and the free plan allows 50.
  */
 import type { D1Database } from "@cloudflare/workers-types";
-import type { Facility, FacilityEvent, Reading, TermBucket, TypicalResponse, TypicalSlot } from "@warriorwatch/contract";
+import type { Facility, FacilityEvent, Reading, SourceKind, TermBucket, TypicalResponse, TypicalSlot } from "@warriorwatch/contract";
 import facilitiesJson from "@warriorwatch/contract/facilities.json";
 
 export interface ReadingRow {
@@ -11,6 +11,14 @@ export interface ReadingRow {
   ts: string;
   count: number;
   max: number;
+}
+
+export interface SourceRow {
+  source: SourceKind;
+  last_attempt: string;
+  last_ok: string | null;
+  failures: number;
+  error: string | null;
 }
 
 export interface ScrapeRow {
@@ -83,13 +91,36 @@ export async function upsertFacilities(db: D1Database, facilities: Facility[], u
 
 let seeded: Promise<void> | null = null;
 
-/** Seed `facilities` from the contract's recon snapshot if the table is empty. At most one check per isolate. */
+/**
+ * Tables added after the first deploy are created here as well as in migrations/, so a deploy never
+ * depends on `wrangler d1 migrations apply` having run first. `IF NOT EXISTS` makes it a no-op later.
+ */
+const LATE_TABLES = [
+  `CREATE TABLE IF NOT EXISTS sources (
+     source TEXT PRIMARY KEY, last_attempt TEXT NOT NULL, last_ok TEXT,
+     failures INTEGER NOT NULL DEFAULT 0, error TEXT)`,
+];
+
+/**
+ * Seed `facilities` from the contract's recon snapshot if the table is empty, and add any facility the
+ * registry has gained since (by id). Also creates LATE_TABLES. At most one check per isolate.
+ */
 export function ensureSeeded(db: D1Database, now: Date): Promise<void> {
   seeded ??= (async () => {
+    for (const ddl of LATE_TABLES) await db.prepare(ddl).run();
     const row = await db.prepare("SELECT COUNT(*) AS n FROM facilities").first<{ n: number }>();
-    if ((row?.n ?? 0) === 0) {
+    const n = row?.n ?? 0;
+    if (n === 0) {
       await upsertFacilities(db, SEED_FACILITIES, now.toISOString());
       console.log(`seeded facilities table with ${SEED_FACILITIES.length} rows from facilities.json`);
+    } else if (n < SEED_FACILITIES.length) {
+      const { results } = await db.prepare("SELECT id FROM facilities").all<{ id: string }>();
+      const have = new Set(results.map((r) => r.id));
+      const missing = SEED_FACILITIES.filter((f) => !have.has(f.id));
+      if (missing.length > 0) {
+        await upsertFacilities(db, missing, now.toISOString());
+        console.log(`added ${missing.length} facilities from facilities.json`);
+      }
     }
   })().catch((err: unknown) => {
     seeded = null;
@@ -176,20 +207,41 @@ export async function readingsWithCarry(db: D1Database, facilityIds: string[], f
   return results;
 }
 
-/** Last time each facility's count or max differed from its previous stored row, looking back from `since`. */
-export async function lastChanges(db: D1Database, since: string): Promise<Map<string, string>> {
+/**
+ * Last time each listed facility's count or max differed from its previous stored row, looking back
+ * from `since`. Scans those facilities' rows since then, so callers pass only the facilities whose
+ * recent series showed no change.
+ */
+export async function lastChanges(db: D1Database, since: string, facilityIds: readonly string[]): Promise<Map<string, string>> {
+  if (facilityIds.length === 0) return new Map();
   const { results } = await db
     .prepare(
       `WITH x AS (
          SELECT facility_id, ts, count, max,
                 LAG(count) OVER (PARTITION BY facility_id ORDER BY ts) AS pc,
                 LAG(max) OVER (PARTITION BY facility_id ORDER BY ts) AS pm
-         FROM readings WHERE ts >= ?1)
+         FROM readings WHERE ts >= ?1 AND facility_id IN (SELECT value FROM json_each(?2)))
        SELECT facility_id, MAX(ts) AS ts FROM x WHERE pc IS NULL OR pc <> count OR pm <> max GROUP BY facility_id`,
     )
-    .bind(since)
+    .bind(since, JSON.stringify(facilityIds))
     .all<{ facility_id: string; ts: string }>();
   return new Map(results.map((r) => [r.facility_id, r.ts]));
+}
+
+// ---------- sources ----------
+
+export function upsertSourceStatement(db: D1Database, s: SourceRow) {
+  return db
+    .prepare(
+      `INSERT INTO sources (source, last_attempt, last_ok, failures, error) VALUES (?1, ?2, ?3, ?4, ?5)
+       ON CONFLICT(source) DO UPDATE SET last_attempt = excluded.last_attempt,
+         last_ok = COALESCE(excluded.last_ok, sources.last_ok), failures = excluded.failures, error = excluded.error`,
+    )
+    .bind(s.source, s.last_attempt, s.last_ok, s.failures, s.error);
+}
+
+export async function readSource(db: D1Database, source: SourceKind): Promise<SourceRow | null> {
+  return db.prepare("SELECT * FROM sources WHERE source = ?").bind(source).first<SourceRow>();
 }
 
 export async function daysOfData(db: D1Database, facilityId: string): Promise<number> {

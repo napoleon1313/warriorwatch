@@ -3,7 +3,7 @@
 import Link from "next/link";
 import type { Facility, LiveFacility } from "@warriorwatch/contract";
 import { busyLabel } from "@warriorwatch/contract";
-import { buildingShort, display, slugOf } from "@/lib/facilities";
+import { buildingShort, display, isLibrary, slugOf } from "@/lib/facilities";
 import { openStatus } from "@/lib/hours";
 import { useCountUp } from "@/lib/hooks";
 import { LABEL_VAR } from "@/lib/labels";
@@ -22,8 +22,9 @@ function Count({ n }: { n: number }) {
   return <>{useCountUp(n)}</>;
 }
 
-/** Four instrument tiles across the top of the live page. */
-export function Overview({ facilities, hoursById, now }: { facilities: LiveFacility[]; hoursById: Map<string, Facility>; now: number }) {
+/** Four instrument tiles across the top of the live page. Gyms only; the libraries have their own section. */
+export function Overview({ facilities: all, hoursById, now }: { facilities: LiveFacility[]; hoursById: Map<string, Facility>; now: number }) {
+  const facilities = all.filter((f) => !isLibrary(f.id));
   const byBuilding = new Map<string, { count: number; max: number; open: number }>();
   for (const f of facilities) {
     if (!f.open) continue;

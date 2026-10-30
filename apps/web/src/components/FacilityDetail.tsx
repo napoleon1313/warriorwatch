@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo } from "react";
 import type { TypicalResponse } from "@warriorwatch/contract";
 import { api, USING_MOCK } from "@/lib/api";
-import { SLUG_TO_ID, display, scheduleUrl, facilityPageUrl } from "@/lib/facilities";
+import { LIBRARY_HOURS_URL, SLUG_TO_ID, display, facilityPageUrl, isLibrary, isLibraryTotal, libraryOf, scheduleUrl, slugOf, sourcePageUrl, zonesOf } from "@/lib/facilities";
 import { openStatus, rangeFor } from "@/lib/hours";
 import { usePolling, useNow } from "@/lib/hooks";
 import { LABEL_VAR } from "@/lib/labels";
@@ -18,6 +18,7 @@ import { HoursTable } from "./HoursTable";
 import { LabelPill } from "./LabelPill";
 import { EmptyState, Notice } from "./Notice";
 import { RecentDays } from "./RecentDays";
+import { RankBars } from "./RankBars";
 import { Ring } from "./Ring";
 import { Section } from "./Section";
 import { Trend } from "./Trend";
@@ -59,15 +60,28 @@ export function FacilityDetail({ slug }: { slug: string }) {
   const dayName = WEEKDAYS[lp.weekday];
   const max = f?.max ?? fac?.maxOccupancy ?? 0;
   const status = fac ? openStatus(fac.hours, now) : null;
-  const vs = f && live.data ? vsUsual(f, live.data.fetchedAt) : null;
+  const library = isLibrary(id);
+  const parentLibrary = libraryOf(id);
+  const zones = useMemo(() => {
+    if (!isLibraryTotal(id) || !live.data) return [];
+    const ids = new Set(zonesOf(id));
+    return live.data.facilities.filter((x) => ids.has(x.id));
+  }, [id, live.data]);
+  const fetchedAt = (library ? live.data?.sources?.waitz?.fetchedAt : null) ?? live.data?.fetchedAt ?? null;
+  const vs = f && fetchedAt ? vsUsual(f, fetchedAt) : null;
   const embed = `<iframe src="${SITE_URL}/embed/${slug}" title="${d.title} occupancy" width="320" height="120" style="border:0;border-radius:14px" loading="lazy"></iframe>`;
 
   return (
     <div className="space-y-4">
-      <nav aria-label="Breadcrumb" className="mono text-[11px]">
+      <nav aria-label="Breadcrumb" className="mono flex flex-wrap gap-x-3 text-[11px]">
         <Link href="/" className="text-muted hover:text-fg">
           ← all rooms
         </Link>
+        {parentLibrary && (
+          <Link href={`/f/${slugOf(parentLibrary)}`} className="text-muted hover:text-fg">
+            ← {display(parentLibrary).title}, whole building
+          </Link>
+        )}
       </nav>
 
       <header className="panel rise flex items-center gap-4 p-4 sm:p-5">
@@ -112,7 +126,23 @@ export function FacilityDetail({ slug }: { slug: string }) {
         )}
       </div>
 
-      {live.data?.stale && <Notice tone="warn">The official page says its numbers are not live right now.</Notice>}
+      {!library && live.data?.stale && <Notice tone="warn">The official page says its numbers are not live right now.</Notice>}
+      {library && live.data?.sources?.waitz?.stale && <Notice tone="warn">The library feed hasn&apos;t updated for a while. These numbers may be out of date.</Notice>}
+
+      {isLibraryTotal(id) && (
+        <Section eyebrow="01" title="Floor by floor, right now" aside={zones.length ? `${zones.filter((z) => z.open).length}/${zones.length} floors open` : "no floor sensors"}>
+          {zones.length === 0 ? (
+            <p className="text-sm text-muted">This library reports one number for the whole building.</p>
+          ) : zones.some((z) => z.open) ? (
+            <RankBars facilities={zones} />
+          ) : (
+            <p className="text-sm text-muted">All floors closed right now.</p>
+          )}
+          <p className="mt-3 text-xs text-muted">
+            The building total is its own sensor reading, so the floors don&apos;t add up to it exactly.
+          </p>
+        </Section>
+      )}
       {(live.error || history.error) && !live.data && (
         <Notice tone="error" action={<button type="button" className="rounded-md border border-current px-3 py-1 text-sm" onClick={live.refresh}>Try again</button>}>
           Couldn&apos;t reach the WarriorWatch API.
@@ -156,17 +186,31 @@ export function FacilityDetail({ slug }: { slug: string }) {
 
         <Section eyebrow="04" title="Hours" aside={status ? `${status.text.toLowerCase()} · ${status.inText}` : " "}>
           {fac ? <HoursTable hours={fac.hours} today={lp.weekday} /> : <div className="skeleton h-48 w-full" aria-hidden="true" />}
-          <p className="mt-3 text-xs text-muted">
-            Regular hours from the facility page. Holidays, varsity games and bookings can close it; check the{" "}
-            <a className="font-medium text-accent underline underline-offset-2" href={scheduleUrl(id)} rel="noopener" target="_blank">
-              official calendar<span className="sr-only"> (opens in a new tab)</span> ↗
-            </a>{" "}
-            or the{" "}
-            <a className="underline underline-offset-2 hover:text-fg" href={facilityPageUrl(id)} rel="noopener" target="_blank">
-              facility page<span className="sr-only"> (opens in a new tab)</span> ↗
-            </a>
-            .
-          </p>
+          {library ? (
+            <p className="mt-3 text-xs text-muted">
+              Regular-term hours. Exam periods, reading week and holidays differ; check the{" "}
+              <a className="font-medium text-accent underline underline-offset-2" href={LIBRARY_HOURS_URL} rel="noopener" target="_blank">
+                library hours page<span className="sr-only"> (opens in a new tab)</span> ↗
+              </a>
+              . Seat counts come from{" "}
+              <a className="underline underline-offset-2 hover:text-fg" href={sourcePageUrl(id)} rel="noopener" target="_blank">
+                Waitz<span className="sr-only"> (opens in a new tab)</span> ↗
+              </a>
+              , which estimates people from Bluetooth and Wi-Fi signals.
+            </p>
+          ) : (
+            <p className="mt-3 text-xs text-muted">
+              Regular hours from the facility page. Holidays, varsity games and bookings can close it; check the{" "}
+              <a className="font-medium text-accent underline underline-offset-2" href={scheduleUrl(id)} rel="noopener" target="_blank">
+                official calendar<span className="sr-only"> (opens in a new tab)</span> ↗
+              </a>{" "}
+              or the{" "}
+              <a className="underline underline-offset-2 hover:text-fg" href={facilityPageUrl(id)} rel="noopener" target="_blank">
+                facility page<span className="sr-only"> (opens in a new tab)</span> ↗
+              </a>
+              .
+            </p>
+          )}
         </Section>
       </div>
 

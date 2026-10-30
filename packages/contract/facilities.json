@@ -992,5 +992,420 @@
       "Friday": "6:00 AM - 11:59 PM",
       "Saturday": "9:00 AM - 11:59 PM"
     }
+  },
+  {
+    "id": "waitz-215",
+    "name": "Dana Porter Library",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library"
+    ],
+    "type": "Library",
+    "area": null,
+    "maxOccupancy": 959,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-216",
+    "name": "Davis Centre Library",
+    "building": "Davis Centre Library",
+    "path": [
+      "Davis Centre Library"
+    ],
+    "type": "Library",
+    "area": null,
+    "maxOccupancy": 673,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 11:59 PM",
+      "Monday": "8:00 AM - 11:59 PM",
+      "Tuesday": "8:00 AM - 11:59 PM",
+      "Wednesday": "8:00 AM - 11:59 PM",
+      "Thursday": "8:00 AM - 11:59 PM",
+      "Friday": "8:00 AM - 11:59 PM",
+      "Saturday": "11:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "waitz-217",
+    "name": "Musagetes Architecture Library",
+    "building": "Musagetes Architecture Library",
+    "path": [
+      "Musagetes Architecture Library"
+    ],
+    "type": "Library",
+    "area": null,
+    "maxOccupancy": 66,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "8:00 AM - 10:30 PM",
+      "Monday": "8:00 AM - 10:30 PM",
+      "Tuesday": "8:00 AM - 10:30 PM",
+      "Wednesday": "8:00 AM - 10:30 PM",
+      "Thursday": "8:00 AM - 10:30 PM",
+      "Friday": "8:00 AM - 10:30 PM",
+      "Saturday": "8:00 AM - 10:30 PM"
+    }
+  },
+  {
+    "id": "waitz-648",
+    "name": "Dana Porter Library - Lower Floor - Study Space",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library",
+      "Lower Floor - Study Space"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 35,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-649",
+    "name": "Dana Porter Library - Main Floor Study Space",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library",
+      "Main Floor Study Space"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 145,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-650",
+    "name": "Dana Porter Library - Main Floor - Adaptive Technology Centre",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library",
+      "Main Floor - Adaptive Technology Centre"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 9,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-651",
+    "name": "Dana Porter Library - Floor 3 - Study Space",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library",
+      "Floor 3 - Study Space"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 125,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-652",
+    "name": "Dana Porter Library - Floor 6 - Quiet Study",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library",
+      "Floor 6 - Quiet Study"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 115,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-653",
+    "name": "Dana Porter Library - Floor 7 - Silent Study",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library",
+      "Floor 7 - Silent Study"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 120,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-654",
+    "name": "Dana Porter Library - Floor 8 - Silent Study",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library",
+      "Floor 8 - Silent Study"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 120,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-655",
+    "name": "Dana Porter Library - Floor 9 - Quiet Study",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library",
+      "Floor 9 - Quiet Study"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 120,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-656",
+    "name": "Dana Porter Library - Floor 10 - Group Study",
+    "building": "Dana Porter Library",
+    "path": [
+      "Dana Porter Library",
+      "Floor 10 - Group Study"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 170,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 9:00 PM",
+      "Monday": "8:00 AM - 9:00 PM",
+      "Tuesday": "8:00 AM - 9:00 PM",
+      "Wednesday": "8:00 AM - 9:00 PM",
+      "Thursday": "8:00 AM - 9:00 PM",
+      "Friday": "8:00 AM - 9:00 PM",
+      "Saturday": "11:00 AM - 9:00 PM"
+    }
+  },
+  {
+    "id": "waitz-657",
+    "name": "Davis Centre Library - Lower Floor - Group Study (Bookstack Tables)",
+    "building": "Davis Centre Library",
+    "path": [
+      "Davis Centre Library",
+      "Lower Floor - Group Study (Bookstack Tables)"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 128,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 11:59 PM",
+      "Monday": "8:00 AM - 11:59 PM",
+      "Tuesday": "8:00 AM - 11:59 PM",
+      "Wednesday": "8:00 AM - 11:59 PM",
+      "Thursday": "8:00 AM - 11:59 PM",
+      "Friday": "8:00 AM - 11:59 PM",
+      "Saturday": "11:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "waitz-659",
+    "name": "Davis Centre Library - Lower Floor - Group Study (Wall Tables)",
+    "building": "Davis Centre Library",
+    "path": [
+      "Davis Centre Library",
+      "Lower Floor - Group Study (Wall Tables)"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 44,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 11:59 PM",
+      "Monday": "8:00 AM - 11:59 PM",
+      "Tuesday": "8:00 AM - 11:59 PM",
+      "Wednesday": "8:00 AM - 11:59 PM",
+      "Thursday": "8:00 AM - 11:59 PM",
+      "Friday": "8:00 AM - 11:59 PM",
+      "Saturday": "11:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "waitz-661",
+    "name": "Davis Centre Library - Lower Floor - Quiet Study",
+    "building": "Davis Centre Library",
+    "path": [
+      "Davis Centre Library",
+      "Lower Floor - Quiet Study"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 10,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 11:59 PM",
+      "Monday": "8:00 AM - 11:59 PM",
+      "Tuesday": "8:00 AM - 11:59 PM",
+      "Wednesday": "8:00 AM - 11:59 PM",
+      "Thursday": "8:00 AM - 11:59 PM",
+      "Friday": "8:00 AM - 11:59 PM",
+      "Saturday": "11:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "waitz-660",
+    "name": "Davis Centre Library - Lower Floor - Quiet Study Pod Area",
+    "building": "Davis Centre Library",
+    "path": [
+      "Davis Centre Library",
+      "Lower Floor - Quiet Study Pod Area"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 24,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 11:59 PM",
+      "Monday": "8:00 AM - 11:59 PM",
+      "Tuesday": "8:00 AM - 11:59 PM",
+      "Wednesday": "8:00 AM - 11:59 PM",
+      "Thursday": "8:00 AM - 11:59 PM",
+      "Friday": "8:00 AM - 11:59 PM",
+      "Saturday": "11:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "waitz-658",
+    "name": "Davis Centre Library - Main Study Areas",
+    "building": "Davis Centre Library",
+    "path": [
+      "Davis Centre Library",
+      "Main Study Areas"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 413,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 11:59 PM",
+      "Monday": "8:00 AM - 11:59 PM",
+      "Tuesday": "8:00 AM - 11:59 PM",
+      "Wednesday": "8:00 AM - 11:59 PM",
+      "Thursday": "8:00 AM - 11:59 PM",
+      "Friday": "8:00 AM - 11:59 PM",
+      "Saturday": "11:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "waitz-663",
+    "name": "Davis Centre Library - Main Floor - Quiet Study Corner",
+    "building": "Davis Centre Library",
+    "path": [
+      "Davis Centre Library",
+      "Main Floor - Quiet Study Corner"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 24,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 11:59 PM",
+      "Monday": "8:00 AM - 11:59 PM",
+      "Tuesday": "8:00 AM - 11:59 PM",
+      "Wednesday": "8:00 AM - 11:59 PM",
+      "Thursday": "8:00 AM - 11:59 PM",
+      "Friday": "8:00 AM - 11:59 PM",
+      "Saturday": "11:00 AM - 11:59 PM"
+    }
+  },
+  {
+    "id": "waitz-662",
+    "name": "Davis Centre Library - Main Floor - Silent Study Room",
+    "building": "Davis Centre Library",
+    "path": [
+      "Davis Centre Library",
+      "Main Floor - Silent Study Room"
+    ],
+    "type": "Study space",
+    "area": null,
+    "maxOccupancy": 30,
+    "liveOccupancy": true,
+    "hours": {
+      "Sunday": "11:00 AM - 11:59 PM",
+      "Monday": "8:00 AM - 11:59 PM",
+      "Tuesday": "8:00 AM - 11:59 PM",
+      "Wednesday": "8:00 AM - 11:59 PM",
+      "Thursday": "8:00 AM - 11:59 PM",
+      "Friday": "8:00 AM - 11:59 PM",
+      "Saturday": "11:00 AM - 11:59 PM"
+    }
   }
 ]

@@ -145,7 +145,13 @@ export function mockLive(now: number, scenario: MockScenario): LiveResponse {
       sparkline,
     };
   });
-  return { fetchedAt: new Date(fetchedAt).toISOString(), stale: scenario === "stale", facilities };
+  const at = new Date(fetchedAt).toISOString();
+  return {
+    fetchedAt: at,
+    stale: scenario === "stale",
+    facilities,
+    sources: { portal: { fetchedAt: at, stale: scenario === "stale" }, waitz: { fetchedAt: at, stale: false } },
+  };
 }
 
 export function mockFacilities(): FacilitiesResponse {

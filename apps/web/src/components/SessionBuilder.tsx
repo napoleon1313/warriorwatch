@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Facility, TypicalResponse } from "@warriorwatch/contract";
 import { api } from "@/lib/api";
-import { LIVE_SLUGS, SLUG_TO_ID, display } from "@/lib/facilities";
+import { GYM_SLUGS, LIBRARY_TOTAL_SLUGS, SESSION_SLUGS, SLUG_TO_ID, display } from "@/lib/facilities";
 import { rangeFor } from "@/lib/hours";
 import { usePolling, useNow } from "@/lib/hooks";
 import { LABEL_TEXT, LABEL_VAR } from "@/lib/labels";
@@ -50,7 +50,7 @@ export function SessionBuilder() {
   // URL → state once; state → URL always, so a session can be shared.
   useEffect(() => {
     const q = new URLSearchParams(location.search);
-    const b = decodeBlocks(q.get("b"), new Set(LIVE_SLUGS));
+    const b = decodeBlocks(q.get("b"), new Set(SESSION_SLUGS));
     const d = q.get("d");
     const t = decodeTime(q.get("t"));
     if (b.length) setBlocks(b);
@@ -73,7 +73,7 @@ export function SessionBuilder() {
   const weekday = weekdayOf(ymd);
   const facilities = usePolling((s) => api.facilities(s), null, "facilities");
   const typical = usePolling(
-    (s) => Promise.all(LIVE_SLUGS.map((slug) => api.typical(slug, weekday, s))),
+    (s) => Promise.all(SESSION_SLUGS.map((slug) => api.typical(slug, weekday, s))),
     null,
     `typical-all:${weekday}`,
   );
@@ -82,7 +82,7 @@ export function SessionBuilder() {
     const m = new Map<string, RoomInfo>();
     const byId = new Map<string, Facility>((facilities.data?.facilities ?? []).map((f) => [f.id, f]));
     const typ = new Map<string, TypicalResponse>((typical.data ?? []).map((t) => [t.facilityId, t]));
-    for (const slug of LIVE_SLUGS) {
+    for (const slug of SESSION_SLUGS) {
       const id = SLUG_TO_ID[slug]!;
       const f = byId.get(id);
       if (!f) continue;
@@ -186,28 +186,40 @@ export function SessionBuilder() {
     <div className="grid grid-cols-[minmax(0,1fr)] gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
       {/* ---------- 01 pick rooms ---------- */}
       <Section eyebrow="01" title="Pick rooms, in the order you'll do them" aside={`${blocks.length}/${MAX_BLOCKS} blocks`} className="lg:col-span-2">
-        <div className="flex flex-wrap gap-2">
-          {LIVE_SLUGS.map((slug) => {
-            const d = display(SLUG_TO_ID[slug]!);
-            const r = rooms.get(slug);
-            const closedToday = r ? !rangeFor(r.hours, weekday) : false;
-            return (
-              <button
-                key={slug}
-                type="button"
-                onClick={() => add(slug)}
-                disabled={blocks.length >= MAX_BLOCKS || closedToday}
-                className="panel panel-hover group flex items-center gap-2 px-3 py-2 text-left text-sm disabled:opacity-40"
-                title={closedToday ? `Closed ${WEEKDAYS[weekday]}` : `Add 30 min of ${d.title}`}
-              >
-                <span className="mono text-[11px] text-faint group-hover:text-accent">+</span>
-                <span>
-                  <span className="font-medium">{d.title}</span>
-                  <span className="mono ml-1.5 text-[10px] text-faint">{d.where}</span>
-                </span>
-              </button>
-            );
-          })}
+        <div className="space-y-3">
+          {(
+            [
+              ["gyms", GYM_SLUGS],
+              ["libraries · a study block between workouts", LIBRARY_TOTAL_SLUGS],
+            ] as const
+          ).map(([label, group]) => (
+            <div key={label}>
+              <p className="eyebrow mb-1.5">{label}</p>
+              <div className="flex flex-wrap gap-2">
+                {group.map((slug) => {
+                  const d = display(SLUG_TO_ID[slug]!);
+                  const r = rooms.get(slug);
+                  const closedToday = r ? !rangeFor(r.hours, weekday) : false;
+                  return (
+                    <button
+                      key={slug}
+                      type="button"
+                      onClick={() => add(slug)}
+                      disabled={blocks.length >= MAX_BLOCKS || closedToday}
+                      className="panel panel-hover group flex items-center gap-2 px-3 py-2 text-left text-sm disabled:opacity-40"
+                      title={closedToday ? `Closed ${WEEKDAYS[weekday]}` : `Add 30 min of ${d.title}`}
+                    >
+                      <span className="mono text-[11px] text-faint group-hover:text-accent">+</span>
+                      <span>
+                        <span className="font-medium">{d.title}</span>
+                        <span className="mono ml-1.5 text-[10px] text-faint">{d.where}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
         {blocks.length === 0 && (
           <p className="mt-3 text-sm text-muted">

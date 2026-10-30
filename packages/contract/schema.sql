@@ -54,3 +54,13 @@ CREATE TABLE IF NOT EXISTS typical (
   n INTEGER NOT NULL,
   PRIMARY KEY (facility_id, term, weekday, minute)
 );
+
+-- Freshness of each upstream feed the worker polls (the portal keeps its per-attempt log in `scrapes`;
+-- Waitz, polled every 5 minutes, records only its latest state here). One row per SourceKind.
+CREATE TABLE IF NOT EXISTS sources (
+  source TEXT PRIMARY KEY,         -- SourceKind
+  last_attempt TEXT NOT NULL,      -- ISO 8601 UTC
+  last_ok TEXT,                    -- ISO 8601 UTC of the last successful fetch
+  failures INTEGER NOT NULL DEFAULT 0,  -- consecutive failures
+  error TEXT
+);

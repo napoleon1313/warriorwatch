@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { LIVE_FACILITY_ORDER } from "@warriorwatch/contract";
+import { GYM_FACILITY_ORDER } from "@warriorwatch/contract";
 import type { Facility } from "@warriorwatch/contract";
 import facilitiesJson from "@warriorwatch/contract/facilities.json";
 import { decodeEntities, isStale, parseFacilityPage, parseOccupancy } from "../src/parse";
@@ -19,7 +19,7 @@ describe("parseOccupancy", () => {
 
   it("finds the 7 cards once each, despite the duplicated mobile layout", () => {
     expect(snap.readings).toHaveLength(7);
-    expect(new Set(snap.readings.map((r) => r.facilityId))).toEqual(new Set(LIVE_FACILITY_ORDER));
+    expect(new Set(snap.readings.map((r) => r.facilityId))).toEqual(new Set(GYM_FACILITY_ORDER));
   });
 
   it("reads raw headcount and max", () => {

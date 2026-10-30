@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
-import { LIVE_SLUGS, SLUG_TO_ID, display } from "@/lib/facilities";
+import { GYM_SLUGS, LIBRARY_TOTAL_SLUGS, LIVE_SLUGS, SLUG_TO_ID, display, slugOf, zonesOf } from "@/lib/facilities";
 import { rangeFor } from "@/lib/hours";
 import { usePolling, useNow } from "@/lib/hooks";
 import { WEEKDAYS, addDays, formatYmd, localParts, plural, weekdayOf } from "@/lib/time";
@@ -61,12 +61,28 @@ export function Planner() {
             onChange={(e) => setSlug(e.target.value)}
             className="h-11 w-full rounded-md border border-line bg-card px-3 text-base sm:max-w-sm"
           >
-            {LIVE_SLUGS.map((s) => {
-              const d = display(SLUG_TO_ID[s]!);
+            <optgroup label="Gyms">
+              {GYM_SLUGS.map((s) => {
+                const d = display(SLUG_TO_ID[s]!);
+                return (
+                  <option key={s} value={s}>
+                    {d.title} ({d.where})
+                  </option>
+                );
+              })}
+            </optgroup>
+            {LIBRARY_TOTAL_SLUGS.map((lib) => {
+              const id = SLUG_TO_ID[lib]!;
+              const d = display(id);
               return (
-                <option key={s} value={s}>
-                  {d.title} ({d.where})
-                </option>
+                <optgroup key={lib} label={`${d.title} library`}>
+                  <option value={lib}>{d.title} · whole building</option>
+                  {zonesOf(id).map((z) => (
+                    <option key={z} value={slugOf(z)}>
+                      {display(z).title}
+                    </option>
+                  ))}
+                </optgroup>
               );
             })}
           </select>

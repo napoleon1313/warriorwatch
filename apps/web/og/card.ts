@@ -1,6 +1,6 @@
 import { createElement as h, type ReactElement } from "react";
 import type { BusyLabel, LiveFacility, LiveResponse } from "@warriorwatch/contract";
-import { display, slugOf } from "../src/lib/facilities";
+import { display, isLibrary, isLibraryTotal, slugOf } from "../src/lib/facilities";
 import { LABEL_TEXT } from "../src/lib/labels";
 import { formatTime, localParts } from "../src/lib/time";
 
@@ -102,11 +102,14 @@ export function facilityCard(live: LiveResponse, f: LiveFacility, closedText = "
 }
 
 export function liveCard(live: LiveResponse): ReactElement {
-  const rows = live.facilities.map((f) => {
+  // Gyms and whole libraries; floors would not fit the card.
+  const shown = live.facilities.filter((f) => !isLibrary(f.id) || isLibraryTotal(f.id));
+  const rowHeight = shown.length > 8 ? 42 : 52;
+  const rows = shown.map((f) => {
     const d = display(f.id, f.name);
     const frac = f.open ? Math.min(1, f.count / Math.max(1, f.max)) : 0;
     return div(
-      { alignItems: "center", gap: 24, height: 52 },
+      { alignItems: "center", gap: 24, height: rowHeight },
       div({ width: 340, fontSize: 30, fontWeight: 700 }, d.title),
       div(
         { width: 380, height: 18, background: C.line, borderRadius: 999 },
@@ -120,7 +123,7 @@ export function liveCard(live: LiveResponse): ReactElement {
     { width: 1200, height: 630, background: C.bg, color: C.fg, padding: "52px 64px", flexDirection: "column", justifyContent: "space-between", fontFamily: "Inter" },
     div(
       { justifyContent: "space-between", alignItems: "baseline" },
-      div({ fontSize: 46, fontWeight: 700 }, "How busy is the gym?"),
+      div({ fontSize: 46, fontWeight: 700 }, "How busy is campus?"),
       div({ fontSize: 26, color: C.muted }, `${stamp(live.fetchedAt)}${live.stale ? " · source not live" : ""}`),
     ),
     div({ flexDirection: "column", gap: 4 }, ...rows),

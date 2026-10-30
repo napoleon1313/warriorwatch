@@ -1,5 +1,6 @@
 /** Just enough of the D1 API over node:sqlite to run the worker's real SQL in vitest. */
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import type { SQLInputValue } from "node:sqlite";
 import type { D1Database } from "@cloudflare/workers-types";
@@ -29,8 +30,12 @@ class Statement {
 
 export class FakeD1 {
   readonly sqlite = new DatabaseSync(":memory:");
+  /** `schemaPath` is one .sql file, or a migrations directory applied in name order. */
   constructor(schemaPath: string) {
-    this.sqlite.exec(readFileSync(schemaPath, "utf8"));
+    const files = statSync(schemaPath).isDirectory()
+      ? readdirSync(schemaPath).filter((f) => f.endsWith(".sql")).sort().map((f) => join(schemaPath, f))
+      : [schemaPath];
+    for (const f of files) this.sqlite.exec(readFileSync(f, "utf8"));
   }
   prepare(sql: string) {
     return new Statement(this.sqlite, sql);

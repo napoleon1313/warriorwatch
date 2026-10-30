@@ -29,9 +29,9 @@ export default async function AboutPage() {
     <article className="max-w-2xl pb-4 text-[15px] leading-relaxed">
       <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">About WarriorWatch</h1>
       <p className="mt-3 text-muted">
-        One page that answers &ldquo;is the gym packed right now?&rdquo; for the PAC and CIF, plus what&apos;s usual for this hour and
-        the quietest time to go. It&apos;s a student project and is <strong className="text-fg">not affiliated with the University of Waterloo</strong>{" "}
-        or Warrior Athletics &amp; Recreation.
+        One page that answers &ldquo;is the gym packed right now?&rdquo; for the PAC and CIF, and &ldquo;is there a seat at Davis?&rdquo; for the
+        libraries, plus what&apos;s usual for this hour and the quietest time to go. It&apos;s a student project and is{" "}
+        <strong className="text-fg">not affiliated with the University of Waterloo</strong>, Warrior Athletics &amp; Recreation, or the Library.
       </p>
 
       <H2 id="source">Where the number comes from</H2>
@@ -58,6 +58,29 @@ export default async function AboutPage() {
         <li>Open / closed comes from the regular hours on each facility page. Holidays, varsity events and bookings can override them, so check the official calendar linked on each facility page.</li>
       </ul>
 
+      <H2 id="libraries">The libraries</H2>
+      <ul className="mt-3 list-disc space-y-2 pl-5 text-muted">
+        <li>
+          Dana Porter, Davis Centre and Musagetes publish how full they are through{" "}
+          <a className="text-accent underline underline-offset-2" href={SOURCE.waitzPageUrl} rel="noopener">
+            Waitz
+          </a>
+          , the same numbers the Library shows on its own site. Sensors on each floor count nearby Bluetooth and Wi-Fi devices and estimate
+          people from that, so a library count is an estimate (the Library quotes about 95%), not a turnstile count like the gyms.
+        </li>
+        <li>
+          We read Waitz&apos;s public feed every five minutes, which is about how often the sensors update, and keep a change when a floor moves
+          by at least 1% of its seats. A whole-building total is its own sensor reading, so the floors don&apos;t add up to it exactly.
+        </li>
+        <li>
+          Library hours are the regular-term hours from the{" "}
+          <a className="text-accent underline underline-offset-2" href={SOURCE.libraryHoursUrl} rel="noopener">
+            Library&apos;s hours page
+          </a>
+          . Exam periods, reading week and holidays differ; we&apos;ll show a floor as open when it isn&apos;t if the Library has changed its hours.
+        </li>
+      </ul>
+
       <H2 id="labels">What the labels mean</H2>
       <p className="mt-3 text-muted">Labels are the share of the posted maximum occupancy, the same cut-offs the API uses:</p>
       <ul className="mt-3 space-y-2">
@@ -79,8 +102,8 @@ export default async function AboutPage() {
 
       <H2 id="privacy">Privacy</H2>
       <p className="mt-3 text-muted">
-        The source page only has totals, so that&apos;s all we store: a number per room per minute. No names, no WatCard data, no tracking
-        cookies on this site.
+        Both sources only publish totals, so that&apos;s all we store: a number per room or floor per reading. No names, no WatCard data, no
+        device identifiers, no tracking cookies on this site.
       </p>
 
       <H2 id="credit">Credit</H2>
@@ -93,11 +116,11 @@ export default async function AboutPage() {
         <a className="text-accent underline underline-offset-2" href="https://github.com/pauligwe/PACked" rel="noopener">
           PACked
         </a>
-        . The design bar is{" "}
-        <a className="text-accent underline underline-offset-2" href="https://waitz.io/waterloo" rel="noopener">
+        . Library seat counts are{" "}
+        <a className="text-accent underline underline-offset-2" href={SOURCE.waitzPageUrl} rel="noopener">
           Waitz
         </a>
-        .
+        &apos;s (Occuspace), which also set the design bar.
       </p>
 
       <H2 id="api">Public API</H2>

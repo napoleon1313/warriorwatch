@@ -1,3 +1,4 @@
+import { facilitySource } from "@warriorwatch/contract";
 import type { Facility, FacilityId } from "@warriorwatch/contract";
 import { isOpenAt } from "../lib/hours";
 import { localParts, type Weekday } from "../lib/time";
@@ -26,6 +27,13 @@ const PROFILES: Record<FacilityId, Profile> = {
   "b2d98ff8-e37a-42da-bf72-06b259ff1a2c": { peak: 0.7, evening: 1.0 }, // CIF Fitness
   "9f0010ea-3844-4c2a-9357-68db5149cda7": { peak: 0.12, evening: 0.6, sparse: true }, // Esports
 };
+
+/** Libraries (Waitz): fuller through the afternoon, quieter evenings than a gym. */
+const LIBRARY_PROFILE: Profile = { peak: 0.78, evening: 0.45 };
+
+function profileOf(f: Facility): Profile | undefined {
+  return PROFILES[f.id] ?? (facilitySource(f.id) === "waitz" ? LIBRARY_PROFILE : undefined);
+}
 
 /** FNV-1a → [0,1) */
 function hash01(s: string): number {
@@ -75,7 +83,7 @@ function edgeFade(f: Facility, at: number): number {
 /** Expected (median) headcount at an instant. 0 when closed. */
 export function expectedAt(f: Facility, at: number): number {
   const max = f.maxOccupancy ?? 0;
-  const p = PROFILES[f.id];
+  const p = profileOf(f);
   if (!p || !max || !isOpenAt(f.hours, at)) return 0;
   const lp = localParts(at);
   return max * p.peak * shape(lp.minuteOfDay / 60, lp.weekday, p.evening) * edgeFade(f, at);
@@ -98,7 +106,7 @@ export const COUNT_STEP_MIN = 3;
 /** Simulated headcount at an instant. Integer, 0 when closed. */
 export function countAt(f: Facility, at: number): number {
   const max = f.maxOccupancy ?? 0;
-  const p = PROFILES[f.id];
+  const p = profileOf(f);
   if (!p || !max || !isOpenAt(f.hours, at)) return 0;
   const t = Math.floor(at / (COUNT_STEP_MIN * 60_000)) * COUNT_STEP_MIN * 60_000;
   const base = expectedAt(f, t);

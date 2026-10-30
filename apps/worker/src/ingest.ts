@@ -1,5 +1,5 @@
 /** The 1-minute scrape of /FacilityOccupancy, and alerting. */
-import { LIVE_FACILITY_ORDER, SOURCE } from "@warriorwatch/contract";
+import { GYM_FACILITY_ORDER, SOURCE } from "@warriorwatch/contract";
 import type { Reading, Snapshot } from "@warriorwatch/contract";
 import {
   ensureSeeded,
@@ -12,7 +12,7 @@ import type { ReadingRow, ScrapeRow } from "./db";
 import type { Deps, Env, FetchLike } from "./env";
 import { parseOccupancy } from "./parse";
 
-export const EXPECTED_CARDS = LIVE_FACILITY_ORDER.length;
+export const EXPECTED_CARDS = GYM_FACILITY_ORDER.length;
 const FETCH_TIMEOUT_MS = 20_000;
 const RETRY_DELAY_MS = 5_000;
 const ALERT_AFTER_FAILURES = 3;
@@ -27,14 +27,17 @@ export async function fetchPage(fetchImpl: FetchLike, url: string): Promise<stri
   return res.text();
 }
 
+/** Any difference in count or max counts as a change (the portal counter is exact). */
+export const anyChange = (prev: ReadingRow, r: Reading): boolean => prev.count !== r.count || prev.max !== r.max;
+
 /**
- * Change-only storage: keep a reading when count or max differs from the facility's latest
- * stored row, or when the latest row is from an earlier UTC hour (the hourly heartbeat).
+ * Change-only storage: keep a reading when it differs from the facility's latest stored row (by
+ * `changed`, default any difference), or when the latest row is from an earlier UTC hour (the hourly heartbeat).
  */
-export function planReadings(snapshot: Snapshot, latest: Map<string, ReadingRow>): Reading[] {
+export function planReadings(snapshot: Snapshot, latest: Map<string, ReadingRow>, changed: (prev: ReadingRow, r: Reading) => boolean = anyChange): Reading[] {
   return snapshot.readings.filter((r) => {
     const prev = latest.get(r.facilityId);
-    return !prev || prev.count !== r.count || prev.max !== r.max || prev.ts.slice(0, 13) !== r.ts.slice(0, 13);
+    return !prev || changed(prev, r) || prev.ts.slice(0, 13) !== r.ts.slice(0, 13);
   });
 }
 

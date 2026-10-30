@@ -3,7 +3,7 @@ import { Hono } from "hono";
 import type { Context, MiddlewareHandler } from "hono";
 import { cors } from "hono/cors";
 import type { Cache, CacheStorage } from "@cloudflare/workers-types";
-import { FACILITY_SLUGS, LIVE_FACILITY_ORDER, busyLabel } from "@warriorwatch/contract";
+import { FACILITY_SLUGS, LIVE_FACILITY_ORDER, busyLabel, facilitySource } from "@warriorwatch/contract";
 import type {
   BestResponse,
   EventsResponse,
@@ -13,6 +13,7 @@ import type {
   LiveFacility,
   LiveResponse,
   Reading,
+  SourceStatus,
   TermBucket,
   TypicalResponse,
   TypicalSlot,
@@ -40,6 +41,7 @@ import {
   lastOkScrape,
   latestReadings,
   listFacilities,
+  readSource,
   readingsWithCarry,
   recentScrapes,
   typicalAt,
@@ -51,10 +53,13 @@ import { bucketize, sampleAt } from "./series";
 import { DAY, HOUR, MINUTE, isIsoDate } from "./time";
 
 export interface HealthResponse {
+  /** the portal scrape is fresh */
   ok: boolean;
   lastScrape: string | null;
   lastOkScrape: string | null;
   cards: number;
+  /** each upstream feed */
+  sources: { portal: SourceStatus; waitz: SourceStatus & { failures: number } };
 }
 
 const TERM_BUCKETS: TermBucket[] = ["term", "reading-week", "exams", "break", "holiday"];
@@ -62,6 +67,8 @@ const TERM_BUCKETS: TermBucket[] = ["term", "reading-week", "exams", "break", "h
 const MIN_TYPICAL_DAYS = 3;
 /** Data older than this (since the last good scrape) is reported as stale. */
 const STALE_AFTER_MS = 5 * MINUTE;
+/** Waitz is polled every 5 minutes; three missed polls make it stale. */
+const WAITZ_STALE_AFTER_MS = 16 * MINUTE;
 const RATE_LIMIT_PER_MIN = 60;
 
 const SLUG_TO_ID = new Map(Object.entries(FACILITY_SLUGS).map(([id, slug]) => [slug, id]));
@@ -176,16 +183,35 @@ app.get("/", (c) =>
 );
 
 app.get("/api/health", noStore, async (c) => {
-  const [last] = await recentScrapes(c.env.DB, 1);
-  const lastOk = await lastOkScrape(c.env.DB);
-  const fresh = !!lastOk && Date.now() - Date.parse(lastOk.ts) <= STALE_AFTER_MS;
+  await ensureSeeded(c.env.DB, new Date());
+  const [[last], lastOk, waitz] = await Promise.all([recentScrapes(c.env.DB, 1), lastOkScrape(c.env.DB), readSource(c.env.DB, "waitz")]);
+  const now = Date.now();
+  const fresh = !!lastOk && now - Date.parse(lastOk.ts) <= STALE_AFTER_MS;
   return c.json<HealthResponse>({
     ok: !!last && last.ok === 1 && fresh,
     lastScrape: last?.ts ?? null,
     lastOkScrape: lastOk?.ts ?? null,
     cards: last?.cards ?? 0,
+    sources: {
+      portal: { fetchedAt: lastOk?.ts ?? null, stale: !fresh || lastOk?.stale === 1 },
+      waitz: { ...waitzStatus(waitz?.last_ok ?? null, now), failures: waitz?.failures ?? 0 },
+    },
   });
 });
+
+function waitzStatus(lastOk: string | null, now: number): SourceStatus {
+  return { fetchedAt: lastOk, stale: !lastOk || now - Date.parse(lastOk) > WAITZ_STALE_AFTER_MS };
+}
+
+/** Last row in a change-only series whose count or max differs from the row before it; null when the series never moves. */
+function lastChangeIn(series: ReadingRow[]): string | null {
+  for (let i = series.length - 1; i > 0; i--) {
+    const cur = series[i]!;
+    const prev = series[i - 1]!;
+    if (cur.count !== prev.count || cur.max !== prev.max) return cur.ts;
+  }
+  return null;
+}
 
 app.get("/api/facilities", cached(3600), async (c) => {
   await ensureSeeded(c.env.DB, new Date());
@@ -204,22 +230,31 @@ app.get("/api/live", cached(30), async (c) => {
   const slot = localSlot(nowDate.toISOString());
   const term = termBucketFor(nowDate, termCalendar);
 
-  const [lastOk, { facilities }, rows, changes, typical] = await Promise.all([
+  const [lastOk, waitz, { facilities }, rows, typical] = await Promise.all([
     lastOkScrape(db),
+    readSource(db, "waitz"),
     listFacilities(db),
     readingsWithCarry(db, LIVE_FACILITY_ORDER, new Date(sparkTimes[0]!).toISOString(), nowDate.toISOString()),
-    lastChanges(db, new Date(now - 7 * DAY).toISOString()),
     typicalAt(db, term, slot.weekday, slot.minute),
   ]);
-  const validUntil = lastOk ? Date.parse(lastOk.ts) : 0;
+  // Samples are only trusted up to each feed's last successful fetch, so a dead feed shows a gap, not a flat line.
+  const validUntilBy = {
+    portal: lastOk ? Date.parse(lastOk.ts) : 0,
+    waitz: waitz?.last_ok ? Date.parse(waitz.last_ok) : 0,
+  };
   const byFacility = groupRows(rows);
   const meta = new Map(facilities.map((f) => [f.id, f]));
+
+  // "Last change" usually falls inside the 3-hour window already loaded; only flat series need the wider query.
+  const flat = LIVE_FACILITY_ORDER.filter((id) => byFacility.has(id) && lastChangeIn(byFacility.get(id)!) === null);
+  const changes = await lastChanges(db, new Date(now - 7 * DAY).toISOString(), flat);
 
   const out: LiveFacility[] = [];
   for (const id of LIVE_FACILITY_ORDER) {
     const series = byFacility.get(id);
     const latest = series?.[series.length - 1];
     if (!series || !latest) continue;
+    const validUntil = validUntilBy[facilitySource(id)];
     const f = meta.get(id);
     const open = f ? isOpen(f.hours, nowDate) : true;
     const t = typical.get(id);
@@ -240,15 +275,19 @@ app.get("/api/live", cached(30), async (c) => {
       typical: typicalCount,
       delta: typicalCount === null ? null : Math.round((latest.count - typicalCount) * 10) / 10,
       trend: trend(trendInput),
-      lastChange: changes.get(id) ?? latest.ts,
+      lastChange: lastChangeIn(series) ?? changes.get(id) ?? latest.ts,
       sparkline: sampleAt(series, sparkTimes, validUntil).map((s) => s?.count ?? null),
     });
   }
 
   return c.json<LiveResponse>({
     fetchedAt: lastOk?.ts ?? nowDate.toISOString(),
-    stale: !lastOk || lastOk.stale === 1 || now - validUntil > STALE_AFTER_MS,
+    stale: !lastOk || lastOk.stale === 1 || now - validUntilBy.portal > STALE_AFTER_MS,
     facilities: out,
+    sources: {
+      portal: { fetchedAt: lastOk?.ts ?? null, stale: !lastOk || lastOk.stale === 1 || now - validUntilBy.portal > STALE_AFTER_MS },
+      waitz: waitzStatus(waitz?.last_ok ?? null, now),
+    },
   });
 });
 

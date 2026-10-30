@@ -1,7 +1,8 @@
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { beforeEach, describe, expect, it } from "vitest";
-import { FACILITY_SLUGS, LIVE_FACILITY_ORDER, SOURCE } from "@warriorwatch/contract";
+import { FACILITY_SLUGS, GYM_FACILITY_ORDER, LIBRARY_FACILITY_ORDER, LIVE_FACILITY_ORDER, SOURCE } from "@warriorwatch/contract";
 import { APPOINTMENTS_URL } from "@warriorwatch/schedule";
 import type {
   BestResponse,
@@ -15,20 +16,28 @@ import { app } from "../src/api";
 import type { HealthResponse } from "../src/api";
 import { resetSeedCheck } from "../src/db";
 import type { Deps, Env } from "../src/env";
-import { EVENTS_CYCLE_TICKS, eventsSlice, eventsWindow, runEventsTick } from "../src/events";
+import { EVENTS_CYCLE_TICKS, PORTAL_FACILITIES, eventsSlice, eventsWindow, runEventsTick } from "../src/events";
 import { SEED_FACILITIES } from "../src/db";
-import { refreshFacilities } from "../src/facilities";
+import { libraryFacilities, refreshFacilities, refreshLibraries } from "../src/facilities";
 import { planReadings, runScrape } from "../src/ingest";
-import { handleScheduled } from "../src/scheduled";
+import { handleScheduled, typicalDue } from "../src/scheduled";
 import { changedSlots, datesToRebuild, rebuildTypical, sameWeekdayWindows } from "../src/typical";
 import { shiftDateKey } from "../src/time";
 import { FakeD1 } from "./d1-shim";
+import { parseWaitz, runWaitz, significantLibraryChange } from "../src/waitz";
+import type { WaitzLocation } from "../src/waitz";
 
 const path = (p: string) => fileURLToPath(new URL(p, import.meta.url));
 const OCCUPANCY_HTML = readFileSync(path("../../../fixtures/facility-occupancy-2026-10-27-2155.html"), "utf8");
 const FACILITY_HTML = readFileSync(path("../../../fixtures/get-facility-pac-free-weights.html"), "utf8");
 const MAIN_GYM_APPOINTMENTS = readFileSync(path("../../../fixtures/schedule-appointments-pac-main-gym-2026-11-01.json"), "utf8");
+const WAITZ_JSON = readFileSync(path("../../../fixtures/waitz-live-waterloo.json"), "utf8");
 const FREE_WEIGHTS = "7c59cbfb-ea06-46e0-8ec7-06739ccaec45";
+const DANA_PORTER = "waitz-215";
+const waitzJson = (body: string, status = 200) => new Response(body, { status, headers: { "Content-Type": "application/json" } });
+/** Route a responder by URL: the Waitz document for Waitz, `other` for everything else. */
+const withWaitz = (other: (url: string) => Response, body = WAITZ_JSON, status = 200) => (url: string) =>
+  url === SOURCE.waitzLiveUrl ? waitzJson(body, status) : other(url);
 
 interface Call {
   url: string;
@@ -38,7 +47,7 @@ interface Call {
 
 function setup(responder: (url: string) => Response | Promise<Response>, startIso = new Date().toISOString()) {
   resetSeedCheck();
-  const db = new FakeD1(path("../migrations/0001_init.sql"));
+  const db = new FakeD1(path("../migrations"));
   const calls: Call[] = [];
   let clock = Date.parse(startIso);
   const deps: Deps = {
@@ -78,7 +87,7 @@ describe("scrape tick", () => {
     expect(scrape).toMatchObject({ ok: 1, stale: 0, cards: 7, error: null });
     expect(stored).toBe(7);
     expect(t.calls).toEqual([{ url: SOURCE.occupancyUrl, ua: SOURCE.userAgent, body: undefined }]);
-    expect(t.db.sqlite.prepare("SELECT COUNT(*) AS n FROM facilities").get()).toEqual({ n: 44 });
+    expect(t.db.sqlite.prepare("SELECT COUNT(*) AS n FROM facilities").get()).toEqual({ n: 63 });
     expect(t.db.sqlite.prepare("SELECT count, max FROM readings WHERE facility_id = ?").get(FREE_WEIGHTS)).toEqual({ count: 42, max: 75 });
 
     // Same page a minute later, same hour: nothing new stored, scrape still recorded.
@@ -142,13 +151,35 @@ describe("daily facilities refresh", () => {
     expect(sleeps).toEqual(new Array(43).fill(500));
     expect(result.updated).toBe(1);
     expect(result.failed).toHaveLength(43);
-    expect(t.db.sqlite.prepare("SELECT COUNT(*) AS n FROM facilities").get()).toEqual({ n: 44 });
+    expect(t.db.sqlite.prepare("SELECT COUNT(*) AS n FROM facilities").get()).toEqual({ n: 63 });
   });
 
-  it("runs on the daily cron, not the minute cron", async () => {
-    const t = setup(() => html(FACILITY_HTML));
+  it("runs on the daily cron, not the minute cron: 44 portal pages, then the Waitz document", async () => {
+    const t = setup(withWaitz(() => html(FACILITY_HTML)));
     await handleScheduled("15 9 * * *", Date.parse("2026-10-28T09:15:00Z"), t.env, t.deps);
-    expect(t.calls).toHaveLength(44);
+    expect(t.calls).toHaveLength(45);
+    expect(t.calls[44]!.url).toBe(SOURCE.waitzLiveUrl);
+  });
+
+  it("refreshes library names and capacities from Waitz, keeping the registry's hours", async () => {
+    const t = setup(withWaitz(() => html("nope", 404), WAITZ_JSON.replace('"capacity":959', '"capacity":1000')));
+    const before = JSON.stringify(SEED_FACILITIES.find((f) => f.id === DANA_PORTER)!.hours);
+    const result = await refreshLibraries(t.env, t.deps);
+    expect(result).toEqual({ updated: 19, failed: [] });
+    const row = t.db.sqlite.prepare("SELECT name, building, max_occupancy, hours_json FROM facilities WHERE id = ?").get(DANA_PORTER) as Record<string, unknown>;
+    expect(row).toMatchObject({ name: "Dana Porter Library", building: "Dana Porter Library", max_occupancy: 1000 });
+    expect(row.hours_json).toBe(before);
+    const zone = t.db.sqlite.prepare("SELECT name, building, path_json FROM facilities WHERE id = ?").get("waitz-653") as Record<string, unknown>;
+    expect(zone).toEqual({ name: "Dana Porter Library - Floor 7 - Silent Study", building: "Dana Porter Library", path_json: '["Dana Porter Library","Floor 7 - Silent Study"]' });
+  });
+
+  it("logs, but does not invent, a zone the registry does not know", () => {
+    const locs = JSON.parse(WAITZ_JSON).data as WaitzLocation[];
+    locs[0]!.subLocs = [...(locs[0]!.subLocs as WaitzLocation[]), { id: 999, name: "Roof", people: 1, capacity: 5, isOpen: true }];
+    const known = new Map(SEED_FACILITIES.filter((f) => f.id.startsWith("waitz-")).map((f) => [f.id, f]));
+    const { updated, unknown } = libraryFacilities(locs, known);
+    expect(updated).toHaveLength(19);
+    expect(unknown).toEqual(["waitz-999"]);
   });
 });
 
@@ -175,13 +206,15 @@ describe("API", () => {
     await rebuildTypical(t.env, FREE_WEIGHTS, new Date());
   });
 
-  it("/api/live returns all 7 facilities in display order with CORS and cache headers", async () => {
+  it("/api/live returns the 7 gyms in display order with CORS and cache headers", async () => {
     const { res, body } = await get<LiveResponse>("/api/live");
     expect(res.status).toBe(200);
     expect(res.headers.get("Access-Control-Allow-Origin")).toBe("*");
     expect(res.headers.get("Cache-Control")).toBe("public, max-age=30, s-maxage=30");
     expect(body.stale).toBe(false);
-    expect(body.facilities.map((f) => f.id)).toEqual(LIVE_FACILITY_ORDER);
+    // No library poll has run in this test, so only the gyms have readings; libraries are omitted, not faked.
+    expect(body.facilities.map((f) => f.id)).toEqual(GYM_FACILITY_ORDER);
+    expect(body.sources).toEqual({ portal: { fetchedAt: body.fetchedAt, stale: false }, waitz: { fetchedAt: null, stale: true } });
     const fw = body.facilities[0]!;
     expect(fw).toMatchObject({ name: "PAC - 1st Floor - Free Weights", building: "Physical Activities Complex", count: 42, max: 75, pct: 56 });
     expect(fw.sparkline).toHaveLength(36);
@@ -189,11 +222,24 @@ describe("API", () => {
     expect(["closed", "moderate"]).toContain(fw.label); // 42 of 75 is 56%: moderate when open
   });
 
-  it("/api/facilities returns all 44", async () => {
+  it("/api/facilities returns all 63: 44 portal facilities and 19 library zones", async () => {
     const { res, body } = await get<FacilitiesResponse>("/api/facilities");
     expect(res.headers.get("Cache-Control")).toContain("max-age=3600");
-    expect(body.facilities).toHaveLength(44);
-    expect(body.facilities.filter((f) => f.liveOccupancy)).toHaveLength(7);
+    expect(body.facilities).toHaveLength(63);
+    expect(body.facilities.filter((f) => f.liveOccupancy)).toHaveLength(26);
+    expect(body.facilities.find((f) => f.id === DANA_PORTER)).toMatchObject({ building: "Dana Porter Library", maxOccupancy: 959, type: "Library" });
+  });
+
+  it("/api/live includes the libraries once Waitz has been polled, each with its own freshness", async () => {
+    t.deps.fetch = async (url) => (url === SOURCE.waitzLiveUrl ? waitzJson(WAITZ_JSON) : html(OCCUPANCY_HTML));
+    await runWaitz(t.env, t.deps);
+    const { body } = await get<LiveResponse>("/api/live?x=1");
+    expect(body.facilities.map((f) => f.id)).toEqual(LIVE_FACILITY_ORDER);
+    const dp = body.facilities.find((f) => f.id === DANA_PORTER)!;
+    expect(dp).toMatchObject({ name: "Dana Porter Library", building: "Dana Porter Library", count: 547, max: 959, pct: 57 });
+    expect(body.sources?.waitz).toEqual({ fetchedAt: t.deps.now().toISOString(), stale: false });
+    expect((await get<LiveResponse>("/api/typical?facility=dp-floor-7")).res.status).toBe(200);
+    expect((await get<LiveResponse>("/api/history?facility=dana-porter")).res.status).toBe(200);
   });
 
   it("/api/history accepts slugs and buckets", async () => {
@@ -227,7 +273,7 @@ describe("API", () => {
   it("/api/health reports the last scrape", async () => {
     const { res, body } = await get<HealthResponse>("/api/health");
     expect(res.headers.get("Cache-Control")).toBe("no-store");
-    expect(body).toMatchObject({ ok: true, cards: 7 });
+    expect(body).toMatchObject({ ok: true, cards: 7, sources: { portal: { stale: false }, waitz: { fetchedAt: null, stale: true, failures: 0 } } });
   });
 
   it("returns typed errors", async () => {
@@ -255,10 +301,12 @@ describe("facility calendar ingest", () => {
   const NOW = "2026-11-01T16:00:00.000Z"; // Sunday 11:00 EST
   const eventCount = (db: FakeD1) => (db.sqlite.prepare("SELECT COUNT(*) AS n FROM events").get() as { n: number }).n;
 
-  it("covers all 44 facilities once per 15-tick cycle", () => {
+  it("covers the 44 portal facilities once per 15-tick cycle, and no library zone", () => {
     expect(EVENTS_CYCLE_TICKS).toBe(15);
+    expect(PORTAL_FACILITIES).toHaveLength(44);
     const all = Array.from({ length: EVENTS_CYCLE_TICKS }, (_, t) => eventsSlice(t)).flat();
-    expect(all).toEqual(SEED_FACILITIES.map((f) => f.id));
+    expect(all).toEqual(PORTAL_FACILITIES.map((f) => f.id));
+    expect(all.some((id) => id.startsWith("waitz-"))).toBe(false);
     expect(eventsSlice(15)).toEqual(eventsSlice(0));
   });
 
@@ -335,18 +383,92 @@ describe("facility calendar ingest", () => {
   });
 
   it("runs on the minute cron after the scrape, and a calendar failure does not lose the reading", async () => {
-    const t = setup((url) => (url === SOURCE.occupancyUrl ? html(OCCUPANCY_HTML) : json("not json", 500)), NOW);
-    await handleScheduled("* * * * *", Date.parse(NOW), t.env, t.deps);
+    // 16:01 is not a Waitz minute: scrape, then three calendars.
+    const t = setup((url) => (url === SOURCE.occupancyUrl ? html(OCCUPANCY_HTML) : json("not json", 500)), "2026-11-01T16:01:00.000Z");
+    await handleScheduled("* * * * *", Date.parse("2026-11-01T16:01:00.000Z"), t.env, t.deps);
     expect(t.calls.map((c) => c.url.startsWith(APPOINTMENTS_URL))).toEqual([false, true, true, true]);
     expect(t.db.sqlite.prepare("SELECT COUNT(*) AS n FROM readings").get()).toEqual({ n: 7 });
   });
+
+  it("polls Waitz on every 5th minute, between the scrape and the calendars", async () => {
+    const t = setup(withWaitz((url) => (url === SOURCE.occupancyUrl ? html(OCCUPANCY_HTML) : json("[]"))), NOW);
+    await handleScheduled("* * * * *", Date.parse(NOW), t.env, t.deps);
+    expect(t.calls.map((c) => c.url)).toEqual([SOURCE.occupancyUrl, SOURCE.waitzLiveUrl, ...t.calls.slice(2).map((c) => c.url)]);
+    expect(t.calls.slice(2).every((c) => c.url.startsWith(APPOINTMENTS_URL))).toBe(true);
+    expect(t.db.sqlite.prepare("SELECT COUNT(*) AS n FROM readings").get()).toEqual({ n: 7 + 19 });
+  });
 });
 
-describe("migration", () => {
-  it("0001 is the contract schema verbatim", () => {
-    expect(readFileSync(path("../migrations/0001_init.sql"), "utf8")).toBe(
-      readFileSync(path("../../../packages/contract/schema.sql"), "utf8"),
-    );
+describe("migrations", () => {
+  const statements = (sql: string) =>
+    sql
+      .split("\n")
+      .filter((l) => !l.trim().startsWith("--"))
+      .join("\n")
+      .replace(/--[^\n]*/g, "")
+      .split(";")
+      .map((s) => s.replace(/\s+/g, " ").trim())
+      .filter(Boolean)
+      .sort();
+  it("together are the contract schema, statement for statement", () => {
+    const dir = path("../migrations");
+    const applied = readdirSync(dir).filter((f) => f.endsWith(".sql")).sort().map((f) => readFileSync(join(dir, f), "utf8")).join("\n");
+    expect(statements(applied)).toEqual(statements(readFileSync(path("../../../packages/contract/schema.sql"), "utf8")));
+  });
+});
+
+describe("Waitz library ingest", () => {
+  const locations = () => JSON.parse(WAITZ_JSON).data as WaitzLocation[];
+
+  it("parses every library and zone in the document into readings", () => {
+    const snap = parseWaitz(locations(), "2026-10-30T17:36:00.000Z");
+    expect(snap.readings).toHaveLength(19);
+    expect(new Set(snap.readings.map((r) => r.facilityId))).toEqual(new Set(LIBRARY_FACILITY_ORDER));
+    expect(snap.readings.find((r) => r.facilityId === DANA_PORTER)).toEqual({ facilityId: DANA_PORTER, ts: "2026-10-30T17:36:00.000Z", count: 547, max: 959 });
+    expect(snap.readings.find((r) => r.facilityId === "waitz-217")).toMatchObject({ count: 13, max: 66 }); // no subLocs (false)
+  });
+
+  it("needs a move of 1% of capacity, and at least one person, to store a row", () => {
+    const prev = { facility_id: DANA_PORTER, ts: "t", count: 500, max: 959 };
+    const r = (count: number, max = 959) => ({ facilityId: DANA_PORTER, ts: "t", count, max });
+    expect(significantLibraryChange(prev, r(509))).toBe(false);
+    expect(significantLibraryChange(prev, r(510))).toBe(true);
+    expect(significantLibraryChange(prev, r(500, 960))).toBe(true);
+    expect(significantLibraryChange({ ...prev, count: 3, max: 9 }, { ...r(4), max: 9 })).toBe(true);
+  });
+
+  it("stores 19 readings, then nothing for a jittery repeat, and records the feed's freshness", async () => {
+    const t = setup(withWaitz(() => html("", 404)));
+    const first = await runWaitz(t.env, t.deps);
+    expect(first).toEqual({ ok: true, locations: 19, stored: 19, unknown: [], error: null });
+    expect(t.calls).toEqual([{ url: SOURCE.waitzLiveUrl, ua: SOURCE.userAgent, body: undefined }]);
+
+    t.advance(5 * 60_000);
+    t.deps.fetch = async () => waitzJson(WAITZ_JSON.replace('"people":547', '"people":550'));
+    const second = await runWaitz(t.env, t.deps);
+    expect(second.stored).toBe(0);
+    expect(t.db.sqlite.prepare("SELECT source, failures, error FROM sources").all()).toEqual([{ source: "waitz", failures: 0, error: null }]);
+  });
+
+  it("counts consecutive failures, keeps last_ok, and alerts once at three", async () => {
+    const t = setup(withWaitz(() => new Response("ok")));
+    t.env.ALERT_WEBHOOK = "https://hooks.example.test/alert";
+    await runWaitz(t.env, t.deps);
+    const okAt = t.deps.now().toISOString();
+    const fetch = t.deps.fetch;
+    t.deps.fetch = async (url, init) => (url === SOURCE.waitzLiveUrl ? waitzJson("<html>", 503) : fetch(url, init));
+    for (let i = 0; i < 4; i++) {
+      t.advance(5 * 60_000);
+      const r = await runWaitz(t.env, t.deps);
+      expect(r.ok).toBe(false);
+    }
+    expect(t.db.sqlite.prepare("SELECT last_ok, failures FROM sources WHERE source = 'waitz'").get()).toEqual({ last_ok: okAt, failures: 4 });
+    expect(t.calls.filter((c) => c.url === t.env.ALERT_WEBHOOK)).toHaveLength(1);
+  });
+
+  it("rebuilds gym curves every hour and each library's every third hour", () => {
+    expect([0, 1, 2, 3].map((h) => typicalDue(FREE_WEIGHTS, 0, h))).toEqual([true, true, true, true]);
+    expect([0, 1, 2, 3, 4, 5].map((h) => typicalDue(DANA_PORTER, 7, h))).toEqual([false, true, false, false, true, false]);
   });
 });
 

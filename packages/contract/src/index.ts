@@ -23,7 +23,7 @@ export interface Facility {
   type: string | null;
   area: string | null;
   maxOccupancy: number | null;
-  /** true for the 7 facilities that appear on /FacilityOccupancy */
+  /** true for facilities with a live headcount: the 7 on /FacilityOccupancy and the 19 Waitz library zones */
   liveOccupancy: boolean;
   hours: FacilityHours;
 }
@@ -33,9 +33,9 @@ export interface Reading {
   facilityId: FacilityId;
   /** ISO 8601 UTC, the time the page was fetched */
   ts: string;
-  /** raw headcount from canvas[data-occupancy] */
+  /** raw headcount: canvas[data-occupancy] on the portal, `people` on Waitz */
   count: number;
-  /** from "Max Occupancy: N" on the card at the time of the reading */
+  /** "Max Occupancy: N" on the portal card, `capacity` on Waitz, at the time of the reading */
   max: number;
 }
 
@@ -87,10 +87,20 @@ export interface LiveFacility {
   sparkline: (number | null)[];
 }
 
-export interface LiveResponse {
-  fetchedAt: string;        // ISO, when the worker last scraped
+/** Freshness of one upstream feed. */
+export interface SourceStatus {
+  /** ISO, the last successful fetch; null if never */
+  fetchedAt: string | null;
+  /** true when the feed failed recently or flagged its own numbers as not live */
   stale: boolean;
+}
+
+export interface LiveResponse {
+  fetchedAt: string;        // ISO, when the worker last scraped the portal (gyms)
+  stale: boolean;           // the portal feed; see `sources` for each feed
   facilities: LiveFacility[];
+  /** Per-feed freshness, added with the library zones. Absent from older responses. */
+  sources?: Partial<Record<SourceKind, SourceStatus>>;
 }
 
 export interface HistoryPoint { ts: string; count: number; max: number }
@@ -137,8 +147,28 @@ export interface FacilityEvent {
 }
 export interface EventsResponse { facilityId: FacilityId; from: string; to: string; events: FacilityEvent[] }
 
-/** The 7 live facilities in display order (PAC first, then CIF). */
-export const LIVE_FACILITY_ORDER: FacilityId[] = [
+/**
+ * Where a facility's live count comes from.
+ *   portal — warrior.uwaterloo.ca/FacilityOccupancy (WatCard taps at the door), ids are the portal's GUIDs
+ *   waitz  — waitz.io/live/waterloo (Occuspace Bluetooth/Wi-Fi sensors), ids are `waitz-<location id>`
+ */
+export type SourceKind = "portal" | "waitz";
+
+export const WAITZ_ID_PREFIX = "waitz-";
+
+export function facilitySource(id: FacilityId): SourceKind {
+  return id.startsWith(WAITZ_ID_PREFIX) ? "waitz" : "portal";
+}
+
+/** The numeric Waitz location id behind a `waitz-<id>` facility id, or null for portal facilities. */
+export function waitzLocationId(id: FacilityId): number | null {
+  if (!id.startsWith(WAITZ_ID_PREFIX)) return null;
+  const n = Number(id.slice(WAITZ_ID_PREFIX.length));
+  return Number.isInteger(n) ? n : null;
+}
+
+/** The 7 gym spaces on /FacilityOccupancy, in display order (PAC first, then CIF). */
+export const GYM_FACILITY_ORDER: FacilityId[] = [
   "7c59cbfb-ea06-46e0-8ec7-06739ccaec45", // PAC - 1st Floor - Free Weights (75)
   "b03ac6cb-b6ec-4fd4-bd21-e9872a3a43f3", // PAC - 1st Floor - Functional (25)
   "db0e08e1-faa7-4bc5-b639-088d7642a53e", // PAC - 2nd Floor - Cardio (50)
@@ -147,6 +177,38 @@ export const LIVE_FACILITY_ORDER: FacilityId[] = [
   "b2d98ff8-e37a-42da-bf72-06b259ff1a2c", // CIF Fitness Centre (100)
   "9f0010ea-3844-4c2a-9357-68db5149cda7", // Esports & Gaming Lounge - PC's (20)
 ];
+
+/**
+ * The 3 libraries and their 16 sensor zones on Waitz, in display order. A library total is its own
+ * sensor reading, not the sum of its zones (the zones do not cover every seat).
+ */
+export const LIBRARY_FACILITY_ORDER: FacilityId[] = [
+  "waitz-215", // Dana Porter Library (959)
+  "waitz-216", // Davis Centre Library (673)
+  "waitz-217", // Musagetes Architecture Library (66)
+  "waitz-648", // Dana Porter - Lower Floor - Study Space (35)
+  "waitz-649", // Dana Porter - Main Floor Study Space (145)
+  "waitz-650", // Dana Porter - Main Floor - Adaptive Technology Centre (9)
+  "waitz-651", // Dana Porter - Floor 3 - Study Space (125)
+  "waitz-652", // Dana Porter - Floor 6 - Quiet Study (115)
+  "waitz-653", // Dana Porter - Floor 7 - Silent Study (120)
+  "waitz-654", // Dana Porter - Floor 8 - Silent Study (120)
+  "waitz-655", // Dana Porter - Floor 9 - Quiet Study (120)
+  "waitz-656", // Dana Porter - Floor 10 - Group Study (170)
+  "waitz-657", // Davis Centre - Lower Floor - Group Study (Bookstack Tables) (128)
+  "waitz-659", // Davis Centre - Lower Floor - Group Study (Wall Tables) (44)
+  "waitz-661", // Davis Centre - Lower Floor - Quiet Study (10)
+  "waitz-660", // Davis Centre - Lower Floor - Quiet Study Pod Area (24)
+  "waitz-658", // Davis Centre - Main Study Areas (413)
+  "waitz-663", // Davis Centre - Main Floor - Quiet Study Corner (24)
+  "waitz-662", // Davis Centre - Main Floor - Silent Study Room (30)
+];
+
+/** The 3 Waitz library totals (whole building), a subset of LIBRARY_FACILITY_ORDER. */
+export const LIBRARY_TOTAL_IDS: FacilityId[] = ["waitz-215", "waitz-216", "waitz-217"];
+
+/** Every facility with a live count, in display order: gyms, then libraries. */
+export const LIVE_FACILITY_ORDER: FacilityId[] = [...GYM_FACILITY_ORDER, ...LIBRARY_FACILITY_ORDER];
 
 /** Short URL-safe slugs, stable forever (used in routes and the public API). */
 export const FACILITY_SLUGS: Record<FacilityId, string> = {
@@ -157,6 +219,25 @@ export const FACILITY_SLUGS: Record<FacilityId, string> = {
   "f30dc951-26b0-4909-b814-ce54d38c2fbb": "warrior-zone",
   "b2d98ff8-e37a-42da-bf72-06b259ff1a2c": "cif-fitness",
   "9f0010ea-3844-4c2a-9357-68db5149cda7": "esports-lounge",
+  "waitz-215": "dana-porter",
+  "waitz-216": "davis-library",
+  "waitz-217": "musagetes",
+  "waitz-648": "dp-lower",
+  "waitz-649": "dp-main",
+  "waitz-650": "dp-atc",
+  "waitz-651": "dp-floor-3",
+  "waitz-652": "dp-floor-6",
+  "waitz-653": "dp-floor-7",
+  "waitz-654": "dp-floor-8",
+  "waitz-655": "dp-floor-9",
+  "waitz-656": "dp-floor-10",
+  "waitz-657": "dc-lower-bookstacks",
+  "waitz-659": "dc-lower-wall-tables",
+  "waitz-661": "dc-lower-quiet",
+  "waitz-660": "dc-lower-pods",
+  "waitz-658": "dc-main",
+  "waitz-663": "dc-quiet-corner",
+  "waitz-662": "dc-silent-room",
 };
 
 export const SOURCE = {
@@ -164,6 +245,11 @@ export const SOURCE = {
   facilityListUrl: "https://warrior.uwaterloo.ca/Facility",
   facilityUrl: (id: FacilityId) => `https://warrior.uwaterloo.ca/Facility/GetFacility?facilityId=${id}`,
   scheduleUrl: (id: FacilityId) => `https://warrior.uwaterloo.ca/Facility/GetSchedule?facilityId=${id}`,
+  /** Waitz (Occuspace) live JSON for the UW libraries: one document, every location and zone. Updates every few minutes. */
+  waitzLiveUrl: "https://waitz.io/live/waterloo",
+  waitzPageUrl: "https://waitz.io/waterloo",
+  /** Library hours are published through LibCal; the registry keeps regular-term hours. */
+  libraryHoursUrl: "https://libcal.uwaterloo.ca/hours/",
   /** Identify ourselves. Keep the contact so Athletics can reach us. */
   userAgent: "WarriorWatch/0.1 (+https://github.com/napoleon1313/warriorwatch; fbf69b8c0b8b454cb1a1a1ba649a1534@mail.grokbot.com)",
   timezone: "America/Toronto",

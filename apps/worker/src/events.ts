@@ -6,6 +6,7 @@
  * from what is stored. Most ticks read ~40 rows and write nothing.
  */
 import { localDateKey, localDayBounds } from "@warriorwatch/analytics";
+import { facilitySource } from "@warriorwatch/contract";
 import type { FacilityEvent, FacilityId } from "@warriorwatch/contract";
 import { fetchFacilityEvents } from "@warriorwatch/schedule";
 import type { D1Database } from "@cloudflare/workers-types";
@@ -13,15 +14,17 @@ import { SEED_FACILITIES, eventsBetween } from "./db";
 import type { Deps, Env } from "./env";
 import { DAY } from "./time";
 
+/** Only portal facilities have a booking calendar; library zones come from Waitz. */
+export const PORTAL_FACILITIES = SEED_FACILITIES.filter((f) => facilitySource(f.id) === "portal");
 export const EVENTS_PER_TICK = 3;
-export const EVENTS_CYCLE_TICKS = Math.ceil(SEED_FACILITIES.length / EVENTS_PER_TICK); // 15
+export const EVENTS_CYCLE_TICKS = Math.ceil(PORTAL_FACILITIES.length / EVENTS_PER_TICK); // 15
 const GAP_MS = 500;
 const WINDOW_DAYS = 8;
 
 /** The facilities whose calendars refresh on this tick (`tick` = minutes since the epoch). */
 export function eventsSlice(tick: number): FacilityId[] {
   const start = (tick % EVENTS_CYCLE_TICKS) * EVENTS_PER_TICK;
-  return SEED_FACILITIES.slice(start, start + EVENTS_PER_TICK).map((f) => f.id);
+  return PORTAL_FACILITIES.slice(start, start + EVENTS_PER_TICK).map((f) => f.id);
 }
 
 /** Start of today in America/Toronto, through 8 days later. */
