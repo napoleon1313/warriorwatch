@@ -100,7 +100,7 @@ export async function runWaitz(env: Env, deps: Deps): Promise<WaitzResult> {
     result.locations = snapshot.readings.length;
     result.unknown = snapshot.readings.map((r) => r.facilityId).filter((id) => !KNOWN.has(id));
     const known = { ...snapshot, readings: snapshot.readings.filter((r) => KNOWN.has(r.facilityId)) };
-    const toStore = planReadings(known, await latestReadings(env.DB), significantLibraryChange);
+    const toStore = planReadings(known, await latestReadings(env.DB, LIBRARY_FACILITY_ORDER), significantLibraryChange);
     if (toStore.length > 0) statements.push(insertReadingsStatement(env.DB, toStore));
     result.stored = toStore.length;
   }

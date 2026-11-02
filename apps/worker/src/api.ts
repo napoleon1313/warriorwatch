@@ -67,6 +67,8 @@ const TERM_BUCKETS: TermBucket[] = ["term", "reading-week", "exams", "break", "h
 const MIN_TYPICAL_DAYS = 3;
 /** Data older than this (since the last good scrape) is reported as stale. */
 const STALE_AFTER_MS = 5 * MINUTE;
+/** How far back /api/live looks for a facility's last change when its recent series is flat. Bounded: D1 meters rows read. */
+const LAST_CHANGE_LOOKBACK_MS = 2 * DAY;
 /** Waitz is polled every 5 minutes; three missed polls make it stale. */
 const WAITZ_STALE_AFTER_MS = 16 * MINUTE;
 const RATE_LIMIT_PER_MIN = 60;
@@ -235,7 +237,7 @@ app.get("/api/live", cached(30), async (c) => {
     readSource(db, "waitz"),
     listFacilities(db),
     readingsWithCarry(db, LIVE_FACILITY_ORDER, new Date(sparkTimes[0]!).toISOString(), nowDate.toISOString()),
-    typicalAt(db, term, slot.weekday, slot.minute),
+    typicalAt(db, LIVE_FACILITY_ORDER, term, slot.weekday, slot.minute),
   ]);
   // Samples are only trusted up to each feed's last successful fetch, so a dead feed shows a gap, not a flat line.
   const validUntilBy = {
@@ -247,7 +249,7 @@ app.get("/api/live", cached(30), async (c) => {
 
   // "Last change" usually falls inside the 3-hour window already loaded; only flat series need the wider query.
   const flat = LIVE_FACILITY_ORDER.filter((id) => byFacility.has(id) && lastChangeIn(byFacility.get(id)!) === null);
-  const changes = await lastChanges(db, new Date(now - 7 * DAY).toISOString(), flat);
+  const changes = await lastChanges(db, new Date(now - LAST_CHANGE_LOOKBACK_MS).toISOString(), flat);
 
   const out: LiveFacility[] = [];
   for (const id of LIVE_FACILITY_ORDER) {
@@ -360,7 +362,7 @@ app.get("/api/best", cached(900), async (c) => {
     getFacility(c.env.DB, facilityId),
     typicalSlots(c.env.DB, facilityId, term, weekday),
     daysOfData(c.env.DB, facilityId),
-    latestReadings(c.env.DB),
+    latestReadings(c.env.DB, [facilityId]),
   ]);
   const max = facility?.maxOccupancy ?? latest.get(facilityId)?.max ?? 0;
   const windows = bestWindows(fullDay(stored), facility?.hours ?? {}, date, max, { from: now });

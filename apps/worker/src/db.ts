@@ -1,6 +1,12 @@
 /**
  * D1 access. Bulk writes go through `json_each(?)` so a whole batch of rows is ONE query:
  * D1 counts queries per invocation, and the free plan allows 50.
+ *
+ * D1 also meters rows READ (5 million a day on the free plan), so every query here must seek the
+ * primary key, never scan a facility's whole history. "Latest row per facility" is written as a
+ * correlated `MAX(ts)` per facility (an index seek), not `MAX(ts) ... GROUP BY` (a full index scan),
+ * and time windows are separate `UNION ALL` arms so each one is an index range. Check new queries
+ * with EXPLAIN QUERY PLAN against a large table before shipping them.
  */
 import type { D1Database } from "@cloudflare/workers-types";
 import type { Facility, FacilityEvent, Reading, SourceKind, TermBucket, TypicalResponse, TypicalSlot } from "@warriorwatch/contract";
@@ -147,14 +153,15 @@ export async function getFacility(db: D1Database, id: string): Promise<Facility 
 
 // ---------- readings & scrapes ----------
 
-/** Latest stored row per facility. */
-export async function latestReadings(db: D1Database): Promise<Map<string, ReadingRow>> {
+/** Latest stored row for each listed facility: one index seek per facility. */
+export async function latestReadings(db: D1Database, facilityIds: readonly string[]): Promise<Map<string, ReadingRow>> {
+  if (facilityIds.length === 0) return new Map();
   const { results } = await db
     .prepare(
-      `SELECT r.facility_id, r.ts, r.count, r.max FROM readings r
-       JOIN (SELECT facility_id, MAX(ts) AS ts FROM readings GROUP BY facility_id) m
-         ON r.facility_id = m.facility_id AND r.ts = m.ts`,
+      `SELECT r.facility_id, r.ts, r.count, r.max FROM json_each(?1) j
+       JOIN readings r ON r.facility_id = j.value AND r.ts = (SELECT MAX(ts) FROM readings WHERE facility_id = j.value)`,
     )
+    .bind(JSON.stringify(facilityIds))
     .all<ReadingRow>();
   return new Map(results.map((r) => [r.facility_id, r]));
 }
@@ -189,17 +196,17 @@ export async function lastOkScrape(db: D1Database): Promise<ScrapeRow | null> {
  * Rows with ts in [from, to] for the given facilities, plus each facility's last row before `from`
  * (so a change-only series can be forward-filled from the window start). Sorted by facility, ts.
  */
-export async function readingsWithCarry(db: D1Database, facilityIds: string[], from: string, to: string): Promise<ReadingRow[]> {
+export async function readingsWithCarry(db: D1Database, facilityIds: readonly string[], from: string, to: string): Promise<ReadingRow[]> {
+  if (facilityIds.length === 0) return [];
   const ids = JSON.stringify(facilityIds);
   const { results } = await db
     .prepare(
       `SELECT facility_id, ts, count, max FROM readings
          WHERE facility_id IN (SELECT value FROM json_each(?1)) AND ts >= ?2 AND ts <= ?3
        UNION ALL
-       SELECT r.facility_id, r.ts, r.count, r.max FROM readings r
-         JOIN (SELECT facility_id, MAX(ts) AS ts FROM readings
-                 WHERE facility_id IN (SELECT value FROM json_each(?1)) AND ts < ?2 GROUP BY facility_id) m
-           ON r.facility_id = m.facility_id AND r.ts = m.ts
+       SELECT r.facility_id, r.ts, r.count, r.max FROM json_each(?1) j
+         JOIN readings r ON r.facility_id = j.value
+          AND r.ts = (SELECT MAX(ts) FROM readings WHERE facility_id = j.value AND ts < ?2)
        ORDER BY facility_id, ts`,
     )
     .bind(ids, from, to)
@@ -244,9 +251,14 @@ export async function readSource(db: D1Database, source: SourceKind): Promise<So
   return db.prepare("SELECT * FROM sources WHERE source = ?").bind(source).first<SourceRow>();
 }
 
+/**
+ * Distinct days of readings behind the facility's typical curves: per (term, weekday) group, the
+ * most days any slot saw, summed. Read from `typical` (a few hundred rows) rather than counting
+ * distinct dates across the facility's whole readings history.
+ */
 export async function daysOfData(db: D1Database, facilityId: string): Promise<number> {
   const row = await db
-    .prepare("SELECT COUNT(DISTINCT substr(ts, 1, 10)) AS n FROM readings WHERE facility_id = ?")
+    .prepare("SELECT COALESCE(SUM(m), 0) AS n FROM (SELECT MAX(n) AS m FROM typical WHERE facility_id = ?1 GROUP BY term, weekday)")
     .bind(facilityId)
     .first<{ n: number }>();
   return row?.n ?? 0;
@@ -260,12 +272,15 @@ export async function readingsSince(db: D1Database, facilityId: string, since: s
   return results.map((r) => ({ facilityId: r.facility_id, ts: r.ts, count: r.count, max: r.max }));
 }
 
-/** Readings in any of the UTC ranges [since, until), in time order. One query, however many ranges. */
+/**
+ * Readings in any of the UTC ranges [since, until), in time order. One query, one `UNION ALL` arm per
+ * range: an `OR` of ranges would make SQLite scan the facility's whole history instead.
+ */
 export async function readingsInRanges(db: D1Database, facilityId: string, ranges: readonly { since: string; until: string }[]): Promise<Reading[]> {
   if (ranges.length === 0) return [];
-  const where = ranges.map(() => "(ts >= ? AND ts < ?)").join(" OR ");
+  const arms = ranges.map((_, i) => `SELECT facility_id, ts, count, max FROM readings WHERE facility_id = ?1 AND ts >= ?${2 * i + 2} AND ts < ?${2 * i + 3}`);
   const { results } = await db
-    .prepare(`SELECT facility_id, ts, count, max FROM readings WHERE facility_id = ? AND (${where}) ORDER BY ts`)
+    .prepare(`${arms.join(" UNION ALL ")} ORDER BY ts`)
     .bind(facilityId, ...ranges.flatMap((r) => [r.since, r.until]))
     .all<ReadingRow>();
   return results.map((r) => ({ facilityId: r.facility_id, ts: r.ts, count: r.count, max: r.max }));
@@ -297,10 +312,14 @@ export async function typicalSlots(db: D1Database, facilityId: string, term: Ter
   return results;
 }
 
-export async function typicalAt(db: D1Database, term: TermBucket, weekday: number, minute: number): Promise<Map<string, TypicalSlot>> {
+/** The slot for each listed facility: the facility list turns a scan of `typical` into primary-key seeks. */
+export async function typicalAt(db: D1Database, facilityIds: readonly string[], term: TermBucket, weekday: number, minute: number): Promise<Map<string, TypicalSlot>> {
   const { results } = await db
-    .prepare("SELECT facility_id, minute, median, p25, p75, n FROM typical WHERE term = ? AND weekday = ? AND minute = ?")
-    .bind(term, weekday, minute)
+    .prepare(
+      `SELECT facility_id, minute, median, p25, p75, n FROM typical
+       WHERE facility_id IN (SELECT value FROM json_each(?1)) AND term = ?2 AND weekday = ?3 AND minute = ?4`,
+    )
+    .bind(JSON.stringify(facilityIds), term, weekday, minute)
     .all<TypicalSlot & { facility_id: string }>();
   return new Map(results.map(({ facility_id, ...slot }) => [facility_id, slot]));
 }

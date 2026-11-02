@@ -80,7 +80,7 @@ export async function runScrape(env: Env, deps: Deps): Promise<ScrapeResult> {
   };
 
   // Stale pages repeat old numbers; record the attempt but do not store them as readings.
-  const toStore = snapshot && scrape.ok && !snapshot.stale ? planReadings(snapshot, await latestReadings(env.DB)) : [];
+  const toStore = snapshot && scrape.ok && !snapshot.stale ? planReadings(snapshot, await latestReadings(env.DB, GYM_FACILITY_ORDER)) : [];
   const statements = [insertScrapeStatement(env.DB, scrape)];
   if (toStore.length > 0) statements.push(insertReadingsStatement(env.DB, toStore));
   await env.DB.batch(statements);
