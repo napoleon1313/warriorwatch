@@ -20,10 +20,12 @@ import { EVENTS_CYCLE_TICKS, PORTAL_FACILITIES, eventsSlice, eventsWindow, runEv
 import { SEED_FACILITIES } from "../src/db";
 import { libraryFacilities, refreshFacilities, refreshLibraries } from "../src/facilities";
 import { planReadings, runScrape } from "../src/ingest";
-import { handleScheduled, typicalDue } from "../src/scheduled";
-import { changedSlots, datesToRebuild, rebuildTypical, sameWeekdayWindows } from "../src/typical";
+import { handleScheduled } from "../src/scheduled";
+import { changedSlots, dateToRebuild, rebuildTypical, sameWeekdayWindows } from "../src/typical";
+import { lastChanges } from "../src/db";
 import { shiftDateKey } from "../src/time";
 import { FakeD1 } from "./d1-shim";
+import { localDateKey } from "@warriorwatch/analytics";
 import { parseWaitz, runWaitz, significantLibraryChange } from "../src/waitz";
 import type { WaitzLocation } from "../src/waitz";
 
@@ -203,7 +205,7 @@ describe("API", () => {
     }
     t.db.sqlite.exec(`INSERT INTO readings (facility_id, ts, count, max) VALUES ${rows.join(",")}`);
     await runScrape(t.env, t.deps);
-    await rebuildTypical(t.env, FREE_WEIGHTS, new Date());
+    await rebuildTypical(t.env, FREE_WEIGHTS, localDateKey(new Date()), new Date());
   });
 
   it("/api/live returns the 7 gyms in display order with CORS and cache headers", async () => {
@@ -466,20 +468,30 @@ describe("Waitz library ingest", () => {
     expect(t.calls.filter((c) => c.url === t.env.ALERT_WEBHOOK)).toHaveLength(1);
   });
 
-  it("rebuilds gym curves every hour and each library's every third hour", () => {
-    expect([0, 1, 2, 3].map((h) => typicalDue(FREE_WEIGHTS, 0, h))).toEqual([true, true, true, true]);
-    expect([0, 1, 2, 3, 4, 5].map((h) => typicalDue(DANA_PORTER, 7, h))).toEqual([false, true, false, false, true, false]);
+  it("rebuilds curves only in the two hours after local midnight, for the day that just ended", async () => {
+    // 04:06 UTC on Nov 4 is 23:06 EST on Nov 3; 05:06 UTC is 00:06 on Nov 4 (first pass); 06:06 is the retry; 07:06 is past both.
+    const t = setup(withWaitz((url) => (url === SOURCE.occupancyUrl ? html(OCCUPANCY_HTML) : json("[]"))), "2026-11-04T04:06:00.000Z");
+    const rebuilt = async (iso: string) => {
+      t.deps.now = () => new Date(iso);
+      await handleScheduled("* * * * *", Date.parse(iso), t.env, t.deps);
+      return (t.db.sqlite.prepare("SELECT COUNT(*) AS n FROM typical").get() as { n: number }).n;
+    };
+    t.db.sqlite.exec(`INSERT INTO readings (facility_id, ts, count, max) VALUES ('${FREE_WEIGHTS}', '2026-11-03T20:00:00.000Z', 30, 75)`); // Nov 3, 15:00 EST
+    expect(await rebuilt("2026-11-04T04:06:00.000Z")).toBe(0);
+    expect(await rebuilt("2026-11-04T05:06:00.000Z")).toBeGreaterThan(0);
+    expect(await rebuilt("2026-11-04T07:06:00.000Z")).toBe((t.db.sqlite.prepare("SELECT COUNT(*) AS n FROM typical").get() as { n: number }).n);
   });
 });
 
 describe("typical rebuild writes only what moved", () => {
   const day = (iso: string) => iso.slice(0, 10);
 
-  it("rebuilds today, and yesterday too only in the first hours after local midnight", () => {
-    // 2026-11-04 is a Wednesday; 03:30 UTC is 22:30 EST on the 3rd, 06:30 UTC is 01:30 on the 4th.
-    expect(datesToRebuild(new Date("2026-11-04T03:30:00Z"))).toEqual(["2026-11-03"]);
-    expect(datesToRebuild(new Date("2026-11-04T06:30:00Z"))).toEqual(["2026-11-04", "2026-11-03"]);
-    expect(datesToRebuild(new Date("2026-11-04T15:00:00Z"))).toEqual(["2026-11-04"]);
+  it("is due for yesterday during the first two local hours, and not otherwise", () => {
+    // 2026-11-04: 03:30 UTC is 22:30 EST on the 3rd; 06:30 UTC is 01:30 on the 4th; 07:30 UTC is 02:30.
+    expect(dateToRebuild(new Date("2026-11-04T03:30:00Z"))).toBeNull();
+    expect(dateToRebuild(new Date("2026-11-04T05:10:00Z"))).toBe("2026-11-03");
+    expect(dateToRebuild(new Date("2026-11-04T06:30:00Z"))).toBe("2026-11-03");
+    expect(dateToRebuild(new Date("2026-11-04T07:30:00Z"))).toBeNull();
     expect(shiftDateKey("2026-03-01", -1)).toBe("2026-02-28");
   });
 
@@ -510,16 +522,30 @@ describe("typical rebuild writes only what moved", () => {
       }
     }
     t.db.sqlite.exec(`INSERT INTO readings (facility_id, ts, count, max) VALUES ${rows.join(",")}`);
-    const first = await rebuildTypical(t.env, FREE_WEIGHTS, now);
+    const today = localDateKey(now);
+    const first = await rebuildTypical(t.env, FREE_WEIGHTS, today, now);
     expect(first.written).toBeGreaterThanOrEqual(96);
-    const second = await rebuildTypical(t.env, FREE_WEIGHTS, now);
+    const second = await rebuildTypical(t.env, FREE_WEIGHTS, today, now);
     expect(second).toEqual({ groups: first.groups, written: 0 });
 
     // One reading an hour ago today moves at most a handful of slots.
     const ts = new Date(now.getTime() - 3_600_000).toISOString();
     t.db.sqlite.exec(`INSERT INTO readings (facility_id, ts, count, max) VALUES ('${FREE_WEIGHTS}', '${ts}', 99, 75)`);
-    const third = await rebuildTypical(t.env, FREE_WEIGHTS, now);
+    const third = await rebuildTypical(t.env, FREE_WEIGHTS, today, now);
     expect(third.written).toBeGreaterThan(0);
     expect(third.written).toBeLessThanOrEqual(8);
+  });
+
+  it("finds the last change by walking back over heartbeats, and the first reading when nothing ever changed", async () => {
+    const t = setup(() => html(""));
+    const row = (ts: string, count: number) => `('${FREE_WEIGHTS}', '${ts}', ${count}, 75)`;
+    t.db.sqlite.exec(`INSERT INTO readings (facility_id, ts, count, max) VALUES
+      ${row("2026-11-01T10:00:00Z", 5)}, ${row("2026-11-01T11:00:00Z", 5)}, ${row("2026-11-01T11:30:00Z", 7)},
+      ${row("2026-11-01T12:00:00Z", 7)}, ${row("2026-11-01T13:00:00Z", 7)}, ${row("2026-11-01T14:00:00Z", 7)},
+      ('${DANA_PORTER}', '2026-11-01T09:00:00Z', 100, 959), ('${DANA_PORTER}', '2026-11-01T10:00:00Z', 100, 959)`);
+    const m = await lastChanges(t.db.asD1(), [FREE_WEIGHTS, DANA_PORTER, "waitz-217"]);
+    expect(m.get(FREE_WEIGHTS)).toBe("2026-11-01T11:30:00Z");
+    expect(m.get(DANA_PORTER)).toBe("2026-11-01T09:00:00Z");
+    expect(m.has("waitz-217")).toBe(false);
   });
 });

@@ -215,24 +215,26 @@ export async function readingsWithCarry(db: D1Database, facilityIds: readonly st
 }
 
 /**
- * Last time each listed facility's count or max differed from its previous stored row, looking back
- * from `since`. Scans those facilities' rows since then, so callers pass only the facilities whose
- * recent series showed no change.
+ * When each listed facility's count or max last changed. Change-only storage means only hourly
+ * heartbeats sit between the latest row and the last real change, so this is three index seeks per
+ * facility: the latest row, the newest earlier row with a different value, and the row after that one.
+ * A facility whose value never changed reports its first reading.
  */
-export async function lastChanges(db: D1Database, since: string, facilityIds: readonly string[]): Promise<Map<string, string>> {
+export async function lastChanges(db: D1Database, facilityIds: readonly string[]): Promise<Map<string, string>> {
   if (facilityIds.length === 0) return new Map();
   const { results } = await db
     .prepare(
-      `WITH x AS (
-         SELECT facility_id, ts, count, max,
-                LAG(count) OVER (PARTITION BY facility_id ORDER BY ts) AS pc,
-                LAG(max) OVER (PARTITION BY facility_id ORDER BY ts) AS pm
-         FROM readings WHERE ts >= ?1 AND facility_id IN (SELECT value FROM json_each(?2)))
-       SELECT facility_id, MAX(ts) AS ts FROM x WHERE pc IS NULL OR pc <> count OR pm <> max GROUP BY facility_id`,
+      `SELECT j.value AS facility_id,
+              (SELECT MIN(r3.ts) FROM readings r3 WHERE r3.facility_id = j.value AND r3.ts > COALESCE(
+                 (SELECT r2.ts FROM readings r2
+                   WHERE r2.facility_id = j.value AND r2.ts < l.ts AND (r2.count <> l.count OR r2.max <> l.max)
+                   ORDER BY r2.ts DESC LIMIT 1), '')) AS ts
+       FROM json_each(?1) j
+       JOIN readings l ON l.facility_id = j.value AND l.ts = (SELECT MAX(ts) FROM readings WHERE facility_id = j.value)`,
     )
-    .bind(since, JSON.stringify(facilityIds))
-    .all<{ facility_id: string; ts: string }>();
-  return new Map(results.map((r) => [r.facility_id, r.ts]));
+    .bind(JSON.stringify(facilityIds))
+    .all<{ facility_id: string; ts: string | null }>();
+  return new Map(results.filter((r) => r.ts !== null).map((r) => [r.facility_id, r.ts as string]));
 }
 
 // ---------- sources ----------

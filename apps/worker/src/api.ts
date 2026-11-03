@@ -67,8 +67,6 @@ const TERM_BUCKETS: TermBucket[] = ["term", "reading-week", "exams", "break", "h
 const MIN_TYPICAL_DAYS = 3;
 /** Data older than this (since the last good scrape) is reported as stale. */
 const STALE_AFTER_MS = 5 * MINUTE;
-/** How far back /api/live looks for a facility's last change when its recent series is flat. Bounded: D1 meters rows read. */
-const LAST_CHANGE_LOOKBACK_MS = 2 * DAY;
 /** Waitz is polled every 5 minutes; three missed polls make it stale. */
 const WAITZ_STALE_AFTER_MS = 16 * MINUTE;
 const RATE_LIMIT_PER_MIN = 60;
@@ -247,9 +245,9 @@ app.get("/api/live", cached(30), async (c) => {
   const byFacility = groupRows(rows);
   const meta = new Map(facilities.map((f) => [f.id, f]));
 
-  // "Last change" usually falls inside the 3-hour window already loaded; only flat series need the wider query.
+  // "Last change" usually falls inside the 3-hour window already loaded; only flat series need the seek query.
   const flat = LIVE_FACILITY_ORDER.filter((id) => byFacility.has(id) && lastChangeIn(byFacility.get(id)!) === null);
-  const changes = await lastChanges(db, new Date(now - LAST_CHANGE_LOOKBACK_MS).toISOString(), flat);
+  const changes = await lastChanges(db, flat);
 
   const out: LiveFacility[] = [];
   for (const id of LIVE_FACILITY_ORDER) {

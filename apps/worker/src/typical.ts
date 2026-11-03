@@ -1,12 +1,15 @@
 /**
- * Hourly rebuild of the precomputed `typical` table from readings.
+ * Daily rebuild of the precomputed `typical` table from readings.
  *
- * Only the curves that can have moved since the last run are touched: the (term, weekday) groups for
- * today in America/Toronto (and yesterday's, just after midnight). Within a group, only slots whose
- * numbers differ from the stored row are written. D1 meters rows written, so this turns a rebuild that
- * rewrote every slot of every weekday each hour into a handful of rows.
+ * A weekday's curve is the median over completed days of that weekday, so it only changes once a
+ * week: when that weekday ends. The scheduler rebuilds each facility's curve for the day that just
+ * finished (America/Toronto), in the two hours after local midnight (the second pass is a retry and
+ * writes nothing when the first succeeded). Within a group, only slots whose numbers differ from the
+ * stored row are written. D1 meters rows read and written: rebuilding hourly with today's partial
+ * readings cost ~1.4 million rows read a day and made "usual" partly circular (today compared with a
+ * median that already included today).
  */
-import { buildTypical, localDateKey, localDayBounds, localParts, termCalendar } from "@warriorwatch/analytics";
+import { buildTypical, localDayBounds, localParts, termCalendar } from "@warriorwatch/analytics";
 import type { TypicalResponse, TypicalSlot } from "@warriorwatch/contract";
 import { readingsInRanges, typicalSlots, upsertTypical } from "./db";
 import type { Env } from "./env";
@@ -16,13 +19,15 @@ import { HOUR, shiftDateKey } from "./time";
 export const TYPICAL_LOOKBACK_DAYS = 70;
 /** buildTypical carries a reading forward up to 90 min, so each day's window starts early enough to seed its first slots. */
 const CARRY_MS = 2 * HOUR;
-/** Local hours after midnight during which yesterday's curve is still rebuilt, so its last readings land even if one run fails. */
-const FINALIZE_HOURS = 3;
+/** Local hours after midnight during which the finished day is (re)built: the second hour is a retry. */
+export const REBUILD_LOCAL_HOURS = 2;
 
-/** Local dates whose curves may have changed since the previous hourly run: today, plus yesterday just after midnight. */
-export function datesToRebuild(now: Date): string[] {
-  const today = localDateKey(now);
-  return localParts(now).hour < FINALIZE_HOURS ? [today, shiftDateKey(today, -1)] : [today];
+/** The local date whose curve is due now: yesterday, during the first REBUILD_LOCAL_HOURS hours of the day; else null. */
+export function dateToRebuild(now: Date): string | null {
+  const lp = localParts(now);
+  if (lp.hour >= REBUILD_LOCAL_HOURS) return null;
+  const today = `${lp.year}-${String(lp.month).padStart(2, "0")}-${String(lp.day).padStart(2, "0")}`;
+  return shiftDateKey(today, -1);
 }
 
 /** UTC windows for `dateKey` and the same weekday on each earlier week of the lookback, each padded back by CARRY_MS. */
@@ -51,20 +56,19 @@ export interface RebuildResult {
   written: number;
 }
 
-export async function rebuildTypical(env: Env, facilityId: string, now: Date): Promise<RebuildResult> {
+/** Rebuild the facility's curves for `dateKey`'s weekday from that weekday's readings in the lookback, up to `now`. */
+export async function rebuildTypical(env: Env, facilityId: string, dateKey: string, now: Date): Promise<RebuildResult> {
   const result: RebuildResult = { groups: 0, written: 0 };
-  for (const dateKey of datesToRebuild(now)) {
-    const weekday = localParts(localDayBounds(dateKey).start).weekday;
-    const readings = await readingsInRanges(env.DB, facilityId, sameWeekdayWindows(dateKey));
-    // The padding pulls in the tail of the previous day too; keep only the weekday being rebuilt.
-    const groups = buildTypical(readings, termCalendar, { until: now }).filter((g) => g.weekday === weekday);
-    for (const group of groups) {
-      result.groups++;
-      const changed = changedSlots(group, await typicalSlots(env.DB, group.facilityId, group.term, group.weekday));
-      if (changed.length === 0) continue;
-      await upsertTypical(env.DB, [{ ...group, slots: changed }]);
-      result.written += changed.length;
-    }
+  const weekday = localParts(localDayBounds(dateKey).start).weekday;
+  const readings = await readingsInRanges(env.DB, facilityId, sameWeekdayWindows(dateKey));
+  // The padding pulls in the tail of the previous day too; keep only the weekday being rebuilt.
+  const groups = buildTypical(readings, termCalendar, { until: now }).filter((g) => g.weekday === weekday);
+  for (const group of groups) {
+    result.groups++;
+    const changed = changedSlots(group, await typicalSlots(env.DB, group.facilityId, group.term, group.weekday));
+    if (changed.length === 0) continue;
+    await upsertTypical(env.DB, [{ ...group, slots: changed }]);
+    result.written += changed.length;
   }
   return result;
 }

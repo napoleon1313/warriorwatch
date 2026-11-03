@@ -1,27 +1,21 @@
 /**
  * Cron dispatch. Every minute: the portal scrape, then (every 5th minute) the Waitz library poll, then
- * one facility's typical rebuild, then a slice of the booking calendars. Daily: facility metadata.
+ * (in the two hours after local midnight) one facility's typical rebuild for the day that just ended,
+ * then a slice of the booking calendars. Daily: facility metadata.
  */
-import { LIVE_FACILITY_ORDER, facilitySource } from "@warriorwatch/contract";
+import { LIVE_FACILITY_ORDER } from "@warriorwatch/contract";
 import { defaultDeps } from "./env";
 import type { Deps, Env } from "./env";
 import { runEventsTick } from "./events";
 import { refreshFacilities, refreshLibraries } from "./facilities";
 import { runScrape } from "./ingest";
 import { MINUTE } from "./time";
-import { rebuildTypical } from "./typical";
+import { dateToRebuild, rebuildTypical } from "./typical";
 import { WAITZ_EVERY_MINUTES, runWaitz } from "./waitz";
 
 export const DAILY_CRON = "15 9 * * *";
-/** Minutes past each hour at which `typical` is rebuilt, one live facility per minute (26 facilities: :05–:30). */
+/** Minutes past the hour at which `typical` is rebuilt, one live facility per minute (26 facilities: :05–:30). */
 const TYPICAL_FIRST_MINUTE = 5;
-/** Library curves are rebuilt every this many hours (they have ~3x the readings and change slowly); gyms every hour. */
-const LIBRARY_TYPICAL_EVERY_HOURS = 3;
-
-/** Whether this facility's typical curve is due at this UTC hour. */
-export function typicalDue(facilityId: string, index: number, hour: number): boolean {
-  return facilitySource(facilityId) === "portal" || hour % LIBRARY_TYPICAL_EVERY_HOURS === index % LIBRARY_TYPICAL_EVERY_HOURS;
-}
 
 export async function handleScheduled(cron: string, scheduledTime: number, env: Env, deps: Deps = defaultDeps): Promise<void> {
   if (cron === DAILY_CRON) {
@@ -44,13 +38,13 @@ export async function handleScheduled(cron: string, scheduledTime: number, env: 
     }
   }
 
-  // Spread the typical rebuild over minutes :05..:30, one facility per minute, so each invocation stays small.
-  const index = minute - TYPICAL_FIRST_MINUTE;
-  const facilityId = LIVE_FACILITY_ORDER[index];
-  if (facilityId && typicalDue(facilityId, index, at.getUTCHours())) {
+  // Spread the daily rebuild over minutes :05..:30, one facility per minute, so each invocation stays small.
+  const facilityId = LIVE_FACILITY_ORDER[minute - TYPICAL_FIRST_MINUTE];
+  const rebuildDate = facilityId ? dateToRebuild(deps.now()) : null;
+  if (facilityId && rebuildDate) {
     try {
-      const { groups, written } = await rebuildTypical(env, facilityId, deps.now());
-      console.log(`typical ${facilityId}: ${groups} groups, ${written} slots written`);
+      const { groups, written } = await rebuildTypical(env, facilityId, rebuildDate, deps.now());
+      console.log(`typical ${facilityId} for ${rebuildDate}: ${groups} groups, ${written} slots written`);
     } catch (err) {
       console.error(`typical rebuild for ${facilityId} failed: ${String(err)}`);
     }
